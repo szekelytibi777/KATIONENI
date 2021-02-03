@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/copy.png</file>
+        <file>res/cut.png</file>
+        <file>res/new.png</file>
+        <file>res/open.png</file>
+        <file>res/paste.png</file>
+        <file>res/save.png</file>
+        <file>res/shuffle.png</file>
+        <file>res/sidebar.png</file>
+        <file>res/applicationIcon.png</file>
+        <file>res/applicationIcon.ico</file>
+    </qresource>
+</RCC>
