@@ -303,7 +303,7 @@ void CetliDock::load()
 
 Cetli *CetliDock::snap(Group& group)
 {
-
+	return 0;
 }
 
 

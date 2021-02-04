@@ -224,7 +224,6 @@ void KatitoNeni::setPixel(const QPoint &p, bool update)
 int KatitoNeni::walkToEdge(const QPoint startPos, int xDir, int yDir)
 {
 	float edge = 2000;//ui->spinBoxEdge->value()*10;
-	float g;
 	int d = 0;
 	QRgb prev = srcImage.pixel(startPos);
 	QPoint p = startPos;
@@ -259,7 +258,6 @@ void KatitoNeni::alterSlicers()
 	slicerState++;
 	if(slicerState  > 3)
 		slicerState = 0;
-	int s = (width() - 200) / 2;
 	setSlicers();
 }
 
