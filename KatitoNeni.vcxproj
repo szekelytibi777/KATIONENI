@@ -236,7 +236,8 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>copy /Y $(TargetDir)$(TargetFileName) $(SolutionDir)KATITONENI_INSTALL\</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
