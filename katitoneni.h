@@ -92,6 +92,7 @@ public:
 	int walkToEdge(const QPoint startPos, int xDir, int yDir);
 	int radius();
 	float scale;
+	static bool editEnabled;
 public slots:
 	void onItemDoubleClicked(QListWidgetItem *);
 	void onCetliScaleChanged(int v);

@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QImageReader>
 #include <QTextStream>
+#include <QRandomGenerator>
 #include "dstworkarea.h"
 #include "cetli.h"
 
@@ -43,10 +44,13 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		QSize size = c.size();
 		if(!c.selected)
 			p.drawImage(c.pos*scale , c.scaled(size*scale));
-
-
+	}
+	if (selected) {
+		Cetli& c = *selected;
+		p.drawImage(c.pos * scale, c.scaled(c.size() * scale));
 	}
 
+	/*
 	foreach(Cetli* c, selectedGroup()){
 		QSize size = c->size()*scale;
 		QPoint pos = c->pos*scale;
@@ -56,7 +60,7 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		QSize s(size.width()+1, size.height()+1);
 		p.fillRect(QRect(po,s), QColor(255,0,0,64));
 	}
-
+	*/
 	p.end();
 	QWidget::paintEvent(e);
 }
@@ -83,8 +87,11 @@ void CetliDock::resizeEvent(QResizeEvent * event)
 
 int CetliDock::rand(int min, int max)
 {
+	/*
     float r = (float)qrand()/(float)RAND_MAX;
     int ret = (float)min*(1-r)+(float)max*r;
+	*/
+	int ret = QRandomGenerator::global()->bounded(min, max);
     return ret;
 }
 
@@ -133,8 +140,19 @@ void CetliDock::mousePressEvent(QMouseEvent * event)
 {
 	 if(event->button() == Qt::RightButton)
 		 return;
+
+
 	QPoint mousePos = transformed(event->pos());
 	int s = -1;
+	for (Cetli& c : cetlies) {
+		QRect r(c.pos, c.size());
+		if (r.contains(mousePos)) {
+			c.dragOffset = c.pos - event->pos();
+			c.selected = true;
+			selected = &c;
+		}
+	}
+	/*
 	for(int i = 0; i < cetlies.count(); i++ ){
 		Cetli &c =  cetlies[i];
 		QRect r(c.pos, c.size());
@@ -145,6 +163,8 @@ void CetliDock::mousePressEvent(QMouseEvent * event)
 			selected =&c;
 		}
 	}
+	*/
+	/*
 	if(s>=0)
 		cetlies.move(s, cetlies.count()-1);
 	Group group = selectedGroup();
@@ -152,6 +172,7 @@ void CetliDock::mousePressEvent(QMouseEvent * event)
 		Cetli *gc = group[i];
 		gc->dragOffset = gc->pos-mousePos;
 	}
+	*/
 	QWidget::mousePressEvent(event);
 }
 
@@ -163,23 +184,26 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 	QPoint mousePos = transformed(event->pos());
 
 	if(event->button() ==  Qt::RightButton && selected){
-		unhookSelected();
+		//unhookSelected();
 		selected->selected = false;
 		selected = 0;
 		repaint();
 		return;
 	}
 
-	if(selected)
-		cetlies.last().pos =selected->pos;
 
+	if (selected) {
+		selected->pos = mousePos + selected->dragOffset;
+		selected->selected = false;
+	}
+	/*
 	Cetli *p = snap(&cetlies.last());
 
 	Group group = selectedGroup();
 
 	qDebug() << selectedGroup().toString();
 	groups[group.getMainCetli()] = selectedGroup();
-
+	*/
 	repaint();
 	QWidget::mouseReleaseEvent(event);
 }
@@ -192,10 +216,12 @@ void CetliDock::mouseMoveEvent(QMouseEvent * event)
 	{
 		selected->pos = mousePos+selected->dragOffset;
 	}
+	/*
 	for(int i = 0;i < group.count(); i++){
 		Cetli *gc = group[i];
 		gc->pos = mousePos+gc->dragOffset;
 	}
+	*/
 	repaint();
 	QWidget::mouseMoveEvent(event);
 }
@@ -224,7 +250,8 @@ void CetliDock::shuffle()
 	if(selected)
 		selected->selected = false;
 	selected = 0;
-	std::random_shuffle(cetlies.begin(), cetlies.end());
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::shuffle(cetlies.begin(), cetlies.end(), std::default_random_engine(seed));
 	reArrange();
 	repaint();
 }

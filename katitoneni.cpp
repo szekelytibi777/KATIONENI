@@ -9,6 +9,7 @@
 #endif
 
 
+bool KatitoNeni::editEnabled = false;
 
 KatitoNeni::KatitoNeni()
    : srcWorkArea(new SrcWorkArea(this))
@@ -19,7 +20,7 @@ KatitoNeni::KatitoNeni()
    , toolBar(new QToolBar(this))
    , scale(.3f)
    , settings("SzékelyKézmű", "KatitóNéni")
-   , slicerState(0)
+   , slicerState(KatitoNeni::editEnabled ? 0 : 1)
    , cb(new QCheckBox(this))
    , sliderCetliScale(new QSlider(this))
    , scaleFactor(1.0)
@@ -34,9 +35,13 @@ KatitoNeni::KatitoNeni()
 	splitter->addWidget(scrollArea[1]);
 	splitter->addWidget(scrollArea[2]);
 
+	QString path = /*QDir::currentPath()+*/"./SCANNEDPAGES/oldal003.jpg";
 
-	actImagePath = settings.value("actImagePath", "").toString();
-	slicerState = settings.value("slicerState", 0).toInt();
+	actImagePath = settings.value("actImagePath", path).toString();
+	OutputDebugString(actImagePath.toStdWString().c_str());
+	if (KatitoNeni::editEnabled) {
+		slicerState = 0;// settings.value("slicerState", 0).toInt();
+	}
 	setGeometry(settings.value("mainRect",  QRect(100,100, 600, 400)).toRect());
 	cb->setChecked(settings.value("fixOrder", false).toBool());
 	setSlicers();
@@ -50,6 +55,11 @@ KatitoNeni::KatitoNeni()
 	sliderCetliScale->setMaximumWidth(500);
 	connect(sliderCetliScale, SIGNAL(valueChanged(int)), cetliDock, SLOT(onCetliScaleChanged(int)));
 	connect(sliderCetliScale, SIGNAL(valueChanged(int)), this, SLOT(onCetliScaleChanged(int)));
+	if (!KatitoNeni::editEnabled) {
+		cb->hide();
+		sliderCetliScale->hide();
+		scrollArea[1]->hide();
+	}
 
 	srcWorkArea->setBackgroundRole(QPalette::Base);
 	srcWorkArea->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -67,7 +77,8 @@ KatitoNeni::KatitoNeni()
 	pagesList->updateList();//onPagesPathChanged("c:/Users/szekelytibi/Documents/WORK/KATITONENI/SCANNEDPAGES");
 
 	connect(pagesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onItemDoubleClicked(QListWidgetItem *)));
-	setImage(actImagePath);
+	if(!actImagePath.isEmpty())
+		setImage(actImagePath);
 
 	sliderCetliScale->setValue(settings.value("cetliScle", 100).toInt()); // Loat cetlies in cetlidock too
 
@@ -160,17 +171,22 @@ QAction *KatitoNeni::createToolbarAction(const QString &iconFileName, const QStr
 
 void KatitoNeni::createActions()
 {
-//    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+	//    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
-	toolBar = addToolBar(tr("KatitoNeni"));
-	toolBar->addAction(createToolbarAction("open.png", tr("&Open"), tr("OLdalak könyvtár megnyitása"),SLOT(openDir())));
-	toolBar->addAction(createToolbarAction("shuffle.png", tr("&Shuffle"), tr("Cetlik összekeverése"),SLOT(shuffle())));
-	toolBar->addAction(createToolbarAction("sidebar.png", tr("&AlterView"), tr("Nézet váltása"),SLOT(alterSlicers())));
-	toolBar->addAction(createToolbarAction("save.png", tr("&Save"), tr("Cetlik mentése"),SLOT(saveCetlies())));
-	cb->setToolTip(tr("Megoldás mentése pontos sorrenddel"));
-	toolBar->addWidget(cb);
-	sliderCetliScale->setToolTip(tr("Cetlik méretezése"));
-	toolBar->addWidget(sliderCetliScale);
+	
+	if (KatitoNeni::editEnabled) {
+		toolBar = addToolBar(tr("KatitoNeni"));
+		toolBar->addAction(createToolbarAction("open.png", tr("&Open"), tr("OLdalak könyvtár megnyitása"), SLOT(openDir())));
+		toolBar->addAction(createToolbarAction("shuffle.png", tr("&Shuffle"), tr("Cetlik összekeverése"), SLOT(shuffle())));
+		toolBar->addAction(createToolbarAction("sidebar.png", tr("&AlterView"), tr("Nézet váltása"), SLOT(alterSlicers())));
+		toolBar->addAction(createToolbarAction("save.png", tr("&Save"), tr("Cetlik mentése"), SLOT(saveCetlies())));
+		cb->setToolTip(tr("Megoldás mentése pontos sorrenddel"));
+		toolBar->addWidget(cb);
+		sliderCetliScale->setToolTip(tr("Cetlik méretezése"));
+		toolBar->addWidget(sliderCetliScale);
+	}
+	else
+		toolBar->hide();
 }
 
 void KatitoNeni::adjustScrollBar(QScrollBar *scrollBar, double factor)

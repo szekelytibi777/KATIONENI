@@ -23,7 +23,7 @@ PagesList::PagesList(QWidget *parent)
 
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	setHorizontalStepsPerItem(0);
+	//setHorizontalStepsPerItem(0);
 	setMinimumWidth(200);
 	setMaximumWidth(200);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
