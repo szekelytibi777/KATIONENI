@@ -35,7 +35,7 @@ public:
 		return r;
 	}
 	Cetli* neigbour[4];
-	Cetli* groupKey;
+	//Cetli* groupKey;
 private :
 	static int idCount;
 };

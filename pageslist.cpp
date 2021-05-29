@@ -19,11 +19,11 @@ PagesList::PagesList(QWidget *parent)
     , pagesPath("")
     , settings("TBSoft", "KATITONENI")
 {
-    pagesPath = settings.value("pagesPath").toString();
+    pagesPath = settings.value("pagesPath", QDir::currentPath()+"/SCANNEDPAGES").toString();
 
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	setHorizontalStepsPerItem(0);
+	//setHorizontalStepsPerItem(0);
 	setMinimumWidth(200);
 	setMaximumWidth(200);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -44,6 +44,7 @@ void PagesList::updateList()
 {
 	setResizeMode(QListWidget::Fixed);
 	QDir dir(pagesPath+"/thumbnails");
+	qDebug() << dir.absolutePath();
 	if(!dir.exists())
 		createThumbnails();
 	QStringList entries = dir.entryList();

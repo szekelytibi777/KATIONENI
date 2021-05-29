@@ -7,7 +7,7 @@ Cetli::Cetli(const QImage &img,const QString &n, const QPoint &_pos)
 	, uID(idCount++)
 	, name(n)
 	, isAlive(true)
-	, groupKey(0)
+	//, groupKey(0)
 {
 	neigbour[LEFT] = 0;
 	neigbour[RIGHT] = 0;

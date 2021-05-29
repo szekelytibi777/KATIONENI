@@ -22,9 +22,9 @@ public:
 	void clear();
 	DstWorkArea *dstView;
 	QString cetliPath;
-	Group selectedGroup();
+	//Group selectedGroup();
 	void cleanupNeighbours(Cetli *cetli = 0);
-	QMap<Cetli *, Group>  groups;
+	//QMap<Cetli *, Group>  groups;
 	void setAreaWidth(int w){
 		areaWidth = w*.85;
 	}
@@ -38,22 +38,25 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent * event);
 	virtual void mouseMoveEvent(QMouseEvent * event);
 	virtual void keyPressEvent(QKeyEvent * event);
-    virtual void	resizeEvent(QResizeEvent * event);
+    virtual void resizeEvent(QResizeEvent * event);
 private:
+	bool mouseDrag = false;
 	bool fixOrder;
 	float scale;
 	int areaWidth;
     QVector<QListWidgetItem> listItems;
     void fillImage(QImage &img, QRgb color);
     int rand(int min = 0, int max = RAND_MAX);
-	void fixElementPositions(Group group);
-	void walkNeighbours(Cetli *c, QList<Cetli*> &g);
+	void walkNeighbours(Cetli* c, QList<Cetli*>& g);
+	void logCetlies();
+
+	void setHooveredCetlies(QRect &rect, Cetli* m);
+	void setHooveredCetlies(QPoint& point);
 
 	QList<Cetli> cetlies;
+	QList<Cetli*> hooveredCetlies;
 	Cetli *selected;
-	Cetli *snap(Cetli *s);
-	Cetli *snap(Group& group);
-	void unhookSelected();
+	void snap(Cetli* c0, Cetli *c1);
 	QPoint moveStart;
 	QPoint transformed(const QPoint &p);
 	const int gap;
@@ -68,7 +71,6 @@ signals:
 
 public slots:
     void onCetliAdded(QImage &img);
-	void onCetliScaleChanged(int);
 	void onFixOrderToggled(bool);
 };
 #endif // CETLILIST_H
