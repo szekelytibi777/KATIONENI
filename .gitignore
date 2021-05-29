@@ -44,8 +44,8 @@
 *.cbt
 debug/
 *.ZIP
-KATITONENI_INSTALL/SCANNEDPAGES/.DS_Store
-KATITONENI_INSTALL/translations/
+KATITONENI_INSTALL/
 release/
 *.jpg
 *.png
+

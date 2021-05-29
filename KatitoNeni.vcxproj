@@ -111,7 +111,7 @@
     <QtModules>core;gui;widgets</QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="QtSettings">
-    <QtInstall>qt_6.0</QtInstall>
+    <QtInstall>qt_qt5.15</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -370,6 +370,7 @@
     <ClCompile Include="cetli.cpp" />
     <ClCompile Include="cetlidock.cpp" />
     <ClCompile Include="dstworkarea.cpp" />
+    <ClCompile Include="group.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="katitoneni.cpp" />
     <ClCompile Include="main.cpp" />
@@ -383,6 +384,7 @@
     </QtMoc>
     <QtMoc Include="dstworkarea.h">
     </QtMoc>
+    <ClInclude Include="group.h" />
     <ClInclude Include="helper.h" />
     <QtMoc Include="katitoneni.h">
     </QtMoc>

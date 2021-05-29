@@ -74,6 +74,9 @@
     <ClCompile Include="srcworkarea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="group.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cetli.h">
@@ -100,6 +103,9 @@
     <QtMoc Include="srcworkarea.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

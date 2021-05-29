@@ -32,6 +32,8 @@ public:
 	void addToGroup(Cetli *c, Cetli* key = 0);
 	void removeFromGroup(Cetli *c);
 
+	void addToGroup(Cetli* c, Group& g);
+
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	virtual void mousePressEvent(QMouseEvent * event);
@@ -41,6 +43,7 @@ protected:
     virtual void resizeEvent(QResizeEvent * event);
 private:
 	bool mouseDrag = false;
+	bool groupDrag = false;
 	bool fixOrder;
 	float scale;
 	int areaWidth;
@@ -53,9 +56,15 @@ private:
 	void setHooveredCetlies(QRect &rect, Cetli* m);
 	void setHooveredCetlies(QPoint& point);
 
+	void setHooveredGroup(QRect& rect);
+	void setHooveredGroup(QPoint& point);
+
 	QList<Cetli> cetlies;
 	QList<Cetli*> hooveredCetlies;
+	QList<Group> groups;
 	Cetli *selected;
+	Group* hooveredGroup;
+	Group* selectedGroup;
 	void snap(Cetli* c0, Cetli *c1);
 	QPoint moveStart;
 	QPoint transformed(const QPoint &p);

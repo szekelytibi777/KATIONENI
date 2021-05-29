@@ -15,17 +15,19 @@
 #include "dstworkarea.h"
 #include "cetli.h"
 
-CetliDock::CetliDock(DstWorkArea *parent)
-	: QWidget(reinterpret_cast<QWidget *>(parent))
+CetliDock::CetliDock(DstWorkArea* parent)
+	: QWidget(reinterpret_cast<QWidget*>(parent))
 	, dstView(parent)
-	, actPos(0,50)
+	, actPos(0, 50)
 	, gap(5)
 	, rowHeight(0)
 	, selected(0)
-	, moveStart(0,0)
+	, moveStart(0, 0)
 	, areaWidth(500)
 	, scale(1.0f)
 	, fixOrder(false)
+	, hooveredGroup(0)
+	, selectedGroup(0)
 {
 	resize(4000, 2000);
 	grabKeyboard();
@@ -49,6 +51,16 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		QSize s(hc->size().width() + 1, hc->size().height() + 1);
 		p.fillRect(QRect(po, s), QColor(255, 32, 0, 32));
 	}
+	
+	if(hooveredGroup) {
+		for (Cetli* c : *hooveredGroup) {
+			QPoint po(c->pos.x() - 1, c->pos.y() - 1);
+			QSize s(c->size().width() + 1, c->size().height() + 1);
+			p.fillRect(QRect(po, s), QColor(255, 64, 64, 64));
+		}
+	}
+	
+
 	if (selected) {
 		Cetli& c = *selected;
 		p.drawImage(c.pos * scale, c.scaled(c.size() * scale));
@@ -66,6 +78,9 @@ void CetliDock::onCetliAdded(QImage &img)
 	addCetli(img.scaled(s));
 }
 
+void CetliDock::addToGroup(Cetli* c, Group& g) {
+	g.push_back(c);
+}
 
 void CetliDock::logCetlies()
 {
@@ -154,7 +169,10 @@ void CetliDock::mousePressEvent(QMouseEvent* event)
 			cetlies.swapItemsAt(i, cetlies.size() - 1);
 		}
 	}
-	logCetlies();
+
+	selectedGroup = hooveredGroup;
+
+
 	QWidget::mousePressEvent(event);
 }
 
@@ -162,22 +180,41 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 {
 	hooveredCetlies.clear();
 	QPoint mousePos = transformed(event->pos());
-
-	if (mouseDrag && selected) {
-		selected->pos = mousePos + selected->dragOffset;
-		selected->selected = false;
+	
+	if (mouseDrag) {
+		QPoint newPos = mousePos + selected->dragOffset;
+		QPoint groupDrag = newPos - selected->pos;
+		if (selected) {
+			selected->pos = newPos;
+			selected->selected = false;
+		}
+		if (selectedGroup) {
+			for (Cetli* c : *selectedGroup) {
+				if (c != selected) {
+					c->pos += groupDrag;
+				}
+			}
+		}
+		
+		
+		
 		QPoint po(selected->pos.x() - 1, selected->pos.y() - 1);
 		QSize s(selected->size().width() + 1, selected->size().height() + 1);
-		QRect r(po, s);
+		QRect r(po, s);	
+		setHooveredGroup(r);
 		setHooveredCetlies(r, selected);
 	}
 	else {
 		setHooveredCetlies(mousePos);
+		setHooveredGroup(mousePos);
 	}
+
 
 	repaint();
 	QWidget::mouseMoveEvent(event);
 }
+
+
 void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 {
 	if(cetlies.isEmpty())
@@ -186,14 +223,7 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 	mouseDrag = false;
 	QPoint mousePos = transformed(event->pos());
 
-	if (event->button() == Qt::RightButton && selected) {
-		//unhookSelected();
-		if (selected){
-			selected = 0;
-		}
-		repaint();
-		return;
-	}
+	
 
 
 	if (mouseDrag && selected) {
@@ -203,12 +233,32 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 	if (!hooveredCetlies.empty()) {
 		Cetli* hc = hooveredCetlies.back();
 		if (hc && selected) {
-			snap(selected, hc);
+			snap(hc, selected);
 			int i = cetlies.indexOf(*hc);
 			cetlies.swapItemsAt(i, cetlies.size() - 1);
+
+			Group g;
+			Group* gp = &g;
+			if (hooveredGroup)
+				gp = hooveredGroup;
+			gp->addOnce(selected);
+			gp->addOnce(hc);
+			groups.push_back(g);
+			selected = 0;
 		}
 	}
 	
+	if (event->button() == Qt::RightButton) {
+		if (hooveredGroup)
+			hooveredGroup->clear();
+		if (selectedGroup)
+			selectedGroup->clear();
+		if (selected) {
+			selected = 0;
+		}
+		repaint();
+		return;
+	}
 	repaint();
 	QWidget::mouseReleaseEvent(event);
 }
@@ -238,6 +288,38 @@ void CetliDock::setHooveredCetlies(QPoint& point)
 		QRect r(p, s);
 		if (r.contains(point)) {
 			hooveredCetlies.push_back(&c);
+		}
+	}
+}
+
+void CetliDock::setHooveredGroup(QRect& rect)
+{
+	hooveredGroup = 0;
+	for (Group& g : groups) {
+		for (Cetli* c : g) {
+			QPoint p(c->pos.x() - 1, c->pos.y() - 1);
+			QSize s(c->size().width() + 1, c->size().height() + 1);
+			QRect r(p, s);
+			if (r.intersects(rect)) {
+				hooveredGroup = &g;
+				return;
+			}
+		}
+	}
+}
+
+void CetliDock::setHooveredGroup(QPoint& point)
+{
+	hooveredGroup = 0;
+	for (Group& g : groups) {
+		for (Cetli* c : g) {
+			QPoint p(c->pos.x() - 1, c->pos.y() - 1);
+			QSize s(c->size().width() + 1, c->size().height() + 1);
+			QRect r(p, s);
+			if (r.contains(point)) {
+				hooveredGroup = &g;
+				return ;
+			}
 		}
 	}
 }
