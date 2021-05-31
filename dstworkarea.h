@@ -14,7 +14,6 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QMap>
-#include <QLabel>
 #include "helper.h"
 
 class DstWorkArea : public QScrollArea

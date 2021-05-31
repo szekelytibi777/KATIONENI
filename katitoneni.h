@@ -60,6 +60,8 @@
 #include <QPrinter>
 #endif
 
+#include "Log.h"
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QLabel;
@@ -92,6 +94,7 @@ public:
 	int walkToEdge(const QPoint startPos, int xDir, int yDir);
 	int radius();
 	float scale;
+	Log logToFile;
 	static bool editEnabled;
 public slots:
 	void onItemDoubleClicked(QListWidgetItem *);

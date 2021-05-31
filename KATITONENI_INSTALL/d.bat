@@ -1,1 +1,1 @@
-windeployqt KatitoNeni.exe
+windeployqt  --verbose 2 KatitoNeni.exe

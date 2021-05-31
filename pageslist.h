@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QLabel>
 
 class PagesList : public QListWidget
 {

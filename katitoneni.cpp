@@ -19,11 +19,12 @@ KatitoNeni::KatitoNeni()
    , pagesList(new PagesList(this))
    , toolBar(new QToolBar(this))
    , scale(.3f)
-   , settings("TB_Soft", "KatitóNéni")
+   , settings("TBSoft", "KATITONENI")
    , slicerState(KatitoNeni::editEnabled ? 0 : 1)
    , cb(new QCheckBox(this))
    , sliderCetliScale(new QSlider(this))
    , scaleFactor(1.0)
+   , logToFile()
 {
 	createActions();
 	scrollArea[0] = new QScrollArea;
@@ -36,10 +37,9 @@ KatitoNeni::KatitoNeni()
 	splitter->addWidget(scrollArea[2]);
 
 	QString path = QDir::currentPath()+"/SCANNEDPAGES/oldal003.jpg";
+	actImagePath = "";// settings.value("actImagePath", path).toString();
 
-	actImagePath = settings.value("actImagePath", path).toString();
-
-	qDebug() << actImagePath;
+	
 	if (KatitoNeni::editEnabled) {
 		slicerState = 0;// settings.value("slicerState", 0).toInt();
 	}

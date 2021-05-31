@@ -28,6 +28,7 @@ CetliDock::CetliDock(DstWorkArea* parent)
 	, fixOrder(false)
 	, hooveredGroup(0)
 	, selectedGroup(0)
+
 {
 	resize(4000, 2000);
 	grabKeyboard();
@@ -46,6 +47,7 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		QSize size = c.size();
 		p.drawImage(c.pos*scale , c.scaled(size*scale));
 	}
+#if 1
 	for (Cetli* hc : hooveredCetlies) {
 		QPoint po(hc->pos.x() - 1, hc->pos.y() - 1);
 		QSize s(hc->size().width() + 1, hc->size().height() + 1);
@@ -69,6 +71,7 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		p.fillRect(QRect(pt, s), QColor(0, 255, 0, 64));
 	}
 	p.end();
+#endif
 	QWidget::paintEvent(e);
 }
 
@@ -154,8 +157,11 @@ void CetliDock::reArrange()
 
 void CetliDock::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::RightButton)
+	if (event->button() == Qt::RightButton) {
+		if (hooveredGroup)
+			hooveredGroup->clear();
 		return;
+	}
 
 	mouseDrag = true;
 	QPoint mousePos = transformed(event->pos());
@@ -178,8 +184,10 @@ void CetliDock::mousePressEvent(QMouseEvent* event)
 
 void CetliDock::mouseMoveEvent(QMouseEvent* event)
 {
-	hooveredCetlies.clear();
+	static int count = 0;	hooveredCetlies.clear();
 	QPoint mousePos = transformed(event->pos());
+
+	qDebug() << mousePos << " " << QString::number(count++);
 	
 	if (mouseDrag) {
 		QPoint newPos = mousePos + selected->dragOffset;
@@ -205,12 +213,14 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 		setHooveredCetlies(r, selected);
 	}
 	else {
+		
 		setHooveredCetlies(mousePos);
 		setHooveredGroup(mousePos);
 	}
 
 
 	repaint();
+	
 	QWidget::mouseMoveEvent(event);
 }
 

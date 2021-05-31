@@ -13,6 +13,7 @@
 #include <QImageReader>
 #include <QImageWriter>
 #include <QListView>
+#include "Log.h"
 
 PagesList::PagesList(QWidget *parent)
 	: QListWidget(parent)
@@ -20,10 +21,8 @@ PagesList::PagesList(QWidget *parent)
     , settings("TBSoft", "KATITONENI")
 {
     pagesPath = settings.value("pagesPath", QDir::currentPath()+"/SCANNEDPAGES").toString();
-
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	//setHorizontalStepsPerItem(0);
 	setMinimumWidth(200);
 	setMaximumWidth(200);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -44,11 +43,15 @@ void PagesList::updateList()
 {
 	setResizeMode(QListWidget::Fixed);
 	QDir dir(pagesPath+"/thumbnails");
-	qDebug() << dir.absolutePath();
 	if(!dir.exists())
 		createThumbnails();
 	QStringList entries = dir.entryList();
+	
 	listItems.resize(entries.size());
+
+	Log::writeLine(dir.absolutePath());
+	Log::writeLine(QString("entries:   ")+QString::number(entries.size()));
+	Log::writeLine(QString("listItems: ") + QString::number(listItems.size()));
 	setIconSize(QSize(150,200));
 	setViewMode(QListWidget::IconMode);
 	//clear();
@@ -58,6 +61,7 @@ void PagesList::updateList()
 		QString &entry = entries[i];
 		if(entry.contains(".jpg"))
 		{
+	
 			QListWidgetItem &item = listItems[i];
 			QString p = QString("%1/thumbnails/%2").arg(pagesPath).arg(entry);
 			QString b = QString("%1/%2").arg(pagesPath).arg(entry);
@@ -66,8 +70,9 @@ void PagesList::updateList()
 			QImageReader reader(p);
 			QImage img = reader.read();
 			setIconSize(img.size());
+			//Log::writeLine(p); Log::writeLine(reader.errorString());
 			if(!img.isNull())
-			{
+			{				
 				QPixmap pm = QPixmap::fromImage(img);
 				if(!pm.isNull()){
 					QIcon icon(pm);

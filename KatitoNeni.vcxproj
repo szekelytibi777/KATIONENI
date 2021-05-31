@@ -373,6 +373,7 @@
     <ClCompile Include="group.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="katitoneni.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pageslist.cpp" />
     <ClCompile Include="processimage.cpp" />
@@ -390,6 +391,7 @@
     </QtMoc>
     <QtMoc Include="pageslist.h">
     </QtMoc>
+    <ClInclude Include="Log.h" />
     <ClInclude Include="processimage.h" />
     <QtMoc Include="srcworkarea.h">
     </QtMoc>
@@ -444,6 +446,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="mainwindow.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="KatitoNeni.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
