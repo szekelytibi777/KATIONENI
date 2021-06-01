@@ -45,6 +45,21 @@ void CetliDock::paintEvent(QPaintEvent *e)
 	QPainter p;
 	p.begin(this);
 	p.fillRect(rect(),Qt::white);
+	int w = property("width").toInt()-3;
+	int h = property("height").toInt()-3;
+
+	p.setPen(QColor(Qt::GlobalColor::blue));
+	for (int x = 0; x < w; x += w / 5) {
+		p.drawLine(x, 0, x, h - 1);
+	}
+
+	p.setPen(QColor(Qt::GlobalColor::darkBlue));
+	for (int y = 0; y < h; y += h / 5) {
+		p.drawLine(0, y, w, y);
+	}
+
+
+
 	for(int i = 0; i < cetlies.count(); i++){
 		Cetli &c = cetlies[i];
 		if(!c.isAlive)
