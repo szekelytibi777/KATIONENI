@@ -199,7 +199,9 @@ void KatitoNeni::createActions()
 		toolBar->addWidget(sliderCetliScale);
 	}
 	else
-		toolBar->hide();
+	{
+		toolBar->addAction(createToolbarAction("save.png", tr("&Save"), tr("Cetlik mentése"), SLOT(saveCetlies())));
+	}
 }
 
 void KatitoNeni::adjustScrollBar(QScrollBar *scrollBar, double factor)

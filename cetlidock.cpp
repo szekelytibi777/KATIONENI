@@ -136,8 +136,11 @@ int CetliDock::rand(int min, int max)
 
 Cetli CetliDock::nullCetli;
 
-void CetliDock::addCetli(QImage img)
+void CetliDock::addCetli(QImage img, QPoint pos)
 {
+	QPoint& p = pos;
+	if (p.x() < 0)
+		p = actPos;
 	Cetli c(img, QString("cetli%1").arg(cetlies.count(), 3, 10, QLatin1Char('0')), actPos);
 	cetlies.push_back(c);
 	if(c.height() > rowHeight)
@@ -212,7 +215,7 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 	static int count = 0;	hooveredCetlies.clear();
 	QPoint mousePos = transformed(event->pos());
 	const int borderWidth = 10;
-	const int step = 300;
+	const int step = 100;
 	const int animDuration = 200;
 	QSize s = KatitoNeni::mainSize;
 
@@ -268,16 +271,7 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 		}
 	}
 
-
-	
-	//qDebug() << event->pos() << " " << actY;
-
-
-
-	
-		
 	if (mouseDrag) {
-
 
 		QPoint newPos = mousePos + selected->dragOffset;
 		QPoint groupDrag = newPos - selected->pos;
@@ -463,6 +457,19 @@ void CetliDock::save(bool solved)
 	dir.removeRecursively();
 	dir.mkpath(cetliPath);
 
+	QFile file(cetliPath+"/positions.dat");
+	if (file.open(QIODevice::WriteOnly)) {
+		QDataStream  stream(&file);
+		for (int i = 0; i < cetlies.count(); i++) {
+			Cetli& c = cetlies[i];
+			if (!c.isAlive)
+				continue;
+			//QString fn = QString("%1(%2,%3)").arg(c.name).arg(c.pos.x()).arg(c.pos.y());
+			stream << c.name << c.pos;
+		}
+		file.close();
+	}
+
 	for(int i = 0; i < cetlies.count(); i++ ){
 		Cetli &c =  cetlies[i];
 		if(!c.isAlive)
@@ -480,6 +487,22 @@ void CetliDock::load()
 
 	hooveredCetlies.clear();
 	groups.clear();
+	hooveredGroup = 0;
+
+
+	QFile fp(QString("%1/positions.dat").arg(cetliPath));
+	QMap<QString, QPoint> map;
+	if (fp.open(QFile::ReadOnly)) {
+		QDataStream data(&fp);
+		while (data.atEnd()) {
+			QString name;
+			QPoint pos;
+			data >> name >> pos;
+			qDebug() << name;
+			map[name] = pos;
+		}
+		fp.close();
+	}
 
 	QString fn = QString("%1/solution.txt").arg(cetliPath);
 	QFile f(fn);
@@ -532,19 +555,19 @@ void CetliDock::snap(Cetli* c0, Cetli* c1)
 	int bd = qAbs(r0.bottom() - r1.top());
 
 	if(ld < rd && ld < td && ld < bd){//LEFT
-		qDebug() << "LEFT";
+		//qDebug() << "LEFT";
 		c1->pos = c0->pos - QPoint(c0->width(), 0);
 	}
 	else if(rd < ld && rd < td && rd < bd){ //RIGHT
-		qDebug() << "RIGHT";
+	//	qDebug() << "RIGHT";
 		c1->pos = c0->pos + QPoint(c0->width(), 0);
 	}
 	else if(td < ld && td < rd && td < bd){ //TOP
-		qDebug() << "TOP";
+	//	qDebug() << "TOP";
 		c1->pos = c0->pos - QPoint(0, c1->height());
 	}
 	else if(bd < ld && bd < td && bd < ld){//BOTTOM
-		qDebug() << "BOTTOM";
+	//	qDebug() << "BOTTOM";
 		c1->pos = c0->pos + QPoint(0, c0->height());
 	}
 }

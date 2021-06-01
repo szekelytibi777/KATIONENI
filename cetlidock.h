@@ -16,7 +16,7 @@ class CetliDock : public QWidget
     Q_OBJECT
 public:
 	explicit CetliDock(DstWorkArea *parent = nullptr);
-	void addCetli(QImage img);
+	void addCetli(QImage img, QPoint pos = QPoint(-1,-1));
 	void shuffle();
 	void save( bool solved = false);
 	void load();
