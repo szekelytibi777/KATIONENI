@@ -96,6 +96,9 @@ public:
 	float scale;
 	Log logToFile;
 	static bool editEnabled;
+	static QSize mainSize;
+protected:
+	virtual void resizeEvent(QResizeEvent* event);
 public slots:
 	void onItemDoubleClicked(QListWidgetItem *);
 	void onCetliScaleChanged(int v);

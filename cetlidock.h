@@ -6,6 +6,7 @@
 #include <QDockWidget>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QPropertyAnimation>
 #include "dstworkarea.h"
 #include "group.h"
 class KatitoNeni;
@@ -52,6 +53,8 @@ private:
     int rand(int min = 0, int max = RAND_MAX);
 	void walkNeighbours(Cetli* c, QList<Cetli*>& g);
 	void logCetlies();
+	QPoint offset;
+	QPropertyAnimation scrollAnimation;
 
 	void setHooveredCetlies(QRect &rect, Cetli* m);
 	void setHooveredCetlies(QPoint& point);
@@ -81,5 +84,6 @@ signals:
 public slots:
     void onCetliAdded(QImage &img);
 	void onFixOrderToggled(bool);
+	void scrollTimerUpdate();
 };
 #endif // CETLILIST_H

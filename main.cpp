@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 	commandLineParser.addHelpOption();
 	commandLineParser.addPositionalArgument(KatitoNeni::tr("[file]"), KatitoNeni::tr("Image file to open."));
 	commandLineParser.process(QCoreApplication::arguments());
+
 	KatitoNeni imageViewer;
 	imageViewer.show();
     return a.exec();

@@ -95,6 +95,8 @@
     <TargetName>KatitoNeni</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\opencv-build\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\opencv-build\install\x64\mingw\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>debug\</OutDir>
@@ -105,6 +107,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>KatitoNeni</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <IncludePath>C:\opencv-build\install\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QtInstall>Qt-5.12.11</QtInstall>

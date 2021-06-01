@@ -12,8 +12,12 @@
 #include <QImageReader>
 #include <QTextStream>
 #include <QRandomGenerator>
+#include <QScreen>
+#include <QPropertyAnimation>
 #include "dstworkarea.h"
 #include "cetli.h"
+#include "katitoneni.h"
+#include <opencv2/core/core.hpp>
 
 CetliDock::CetliDock(DstWorkArea* parent)
 	: QWidget(reinterpret_cast<QWidget*>(parent))
@@ -28,8 +32,9 @@ CetliDock::CetliDock(DstWorkArea* parent)
 	, fixOrder(false)
 	, hooveredGroup(0)
 	, selectedGroup(0)
-
+	, scrollAnimation(this, "pos")
 {
+	
 	resize(4000, 2000);
 	grabKeyboard();
 	setMouseTracking(true);
@@ -182,16 +187,86 @@ void CetliDock::mousePressEvent(QMouseEvent* event)
 	QWidget::mousePressEvent(event);
 }
 
+void CetliDock::scrollTimerUpdate()
+{
+
+}
+
 void CetliDock::mouseMoveEvent(QMouseEvent* event)
 {
 	static int count = 0;	hooveredCetlies.clear();
 	QPoint mousePos = transformed(event->pos());
+	const int borderWidth = 10;
+	const int step = 300;
+	const int animDuration = 200;
+	QSize s = KatitoNeni::mainSize;
 
-	qDebug() << mousePos << " " << QString::number(count++);
+	QPoint actPos = property("pos").toPoint();
+
+	QPoint cornerBtm = mapToGlobal(parent()->property("rect").toRect().bottomRight());
+	QPoint cornerTop = mapToGlobal(parent()->property("rect").toRect().topLeft());
+	QPoint cursorPoint = QCursor::pos();
 	
+	int tp = cornerTop.y() + borderWidth;
+	int bt = cornerBtm.y() - borderWidth;
+	int lf = cornerTop.x() + borderWidth;
+	int rt = cornerBtm.x() - borderWidth;
+
+	if (cursorPoint.y()+offset.y() > bt) {
+		if (scrollAnimation.state() != QAbstractAnimation::Running) {
+			scrollAnimation.setDuration(animDuration);
+			scrollAnimation.setStartValue(actPos);
+			QPoint endPos(actPos.x(), actPos.y() - step);
+			scrollAnimation.setEndValue(endPos);
+			scrollAnimation.start();
+			offset.setY(offset.y() - step);
+		}
+	}
+	else if (cursorPoint.y() + offset.y() < tp) {
+		if (scrollAnimation.state() != QAbstractAnimation::Running) {
+			scrollAnimation.setDuration(animDuration);
+			scrollAnimation.setStartValue(actPos);
+			QPoint endPos(actPos.x(), actPos.y() + step);
+			scrollAnimation.setEndValue(endPos);
+			scrollAnimation.start();
+			offset.setY(offset.y() + step);
+		}
+	}
+	if (cursorPoint.x() + offset.x() < lf) {
+		if (scrollAnimation.state() != QAbstractAnimation::Running) {
+			scrollAnimation.setDuration(animDuration);
+			scrollAnimation.setStartValue(actPos);
+			QPoint endPos(actPos.x() + step, actPos.y());
+			scrollAnimation.setEndValue(endPos);
+			scrollAnimation.start();
+			offset.setX(offset.x() + step);
+		}
+	}
+	else if (cursorPoint.x() + offset.x() > rt) {
+		if (scrollAnimation.state() != QAbstractAnimation::Running) {
+			scrollAnimation.setDuration(animDuration);
+			scrollAnimation.setStartValue(actPos);
+			QPoint endPos(actPos.x() - step, actPos.y());
+			scrollAnimation.setEndValue(endPos);
+			scrollAnimation.start();
+			offset.setX(offset.x() - step);
+		}
+	}
+
+
+	
+	//qDebug() << event->pos() << " " << actY;
+
+
+
+	
+		
 	if (mouseDrag) {
+
+
 		QPoint newPos = mousePos + selected->dragOffset;
 		QPoint groupDrag = newPos - selected->pos;
+		//setProperty("pos", actPos);
 		if (selected) {
 			selected->pos = newPos;
 			selected->selected = false;
@@ -387,6 +462,9 @@ void CetliDock::load()
 	QDir dir(cetliPath);
 	QStringList entries = dir.entryList();
 	clear();
+
+	hooveredCetlies.clear();
+	groups.clear();
 
 	QString fn = QString("%1/solution.txt").arg(cetliPath);
 	QFile f(fn);

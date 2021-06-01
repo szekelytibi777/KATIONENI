@@ -10,7 +10,7 @@
 
 
 bool KatitoNeni::editEnabled = false;
-
+QSize KatitoNeni::mainSize;
 KatitoNeni::KatitoNeni()
    : srcWorkArea(new SrcWorkArea(this))
    , dstWorkArea(new DstWorkArea(this))
@@ -43,9 +43,15 @@ KatitoNeni::KatitoNeni()
 	if (KatitoNeni::editEnabled) {
 		slicerState = 0;// settings.value("slicerState", 0).toInt();
 	}
-	setGeometry(settings.value("mainRect",  QRect(100,100, 600, 400)).toRect());
+	
+	setGeometry(settings.value("mainRect", QRect(100, 100, 600, 400)).toRect());
 	setSlicers();
 	cetliDock->cetliPath = actImagePath.replace(".jpg", "");
+
+	mainSize = property("size").toSize();
+	QSize ps = pagesList->property("size").toSize();
+	mainSize.setWidth(mainSize.width() - ps.width());
+
 
 
 	sliderCetliScale->setRange(52, 200);
@@ -150,6 +156,15 @@ void KatitoNeni::openDir()
 												 | QFileDialog::DontResolveSymlinks);    QFileDialog dialog(this, tr("Open File"));
 	pagesList->setPath(dir);
 	pagesList->updateList();
+}
+
+void KatitoNeni::resizeEvent(QResizeEvent* event)
+{
+	QSize ps = pagesList->property("size").toSize();
+	mainSize = property("size").toSize();
+
+	mainSize.setWidth(mainSize.width() - ps.width());
+	QWidget::resizeEvent(event);
 }
 
 void KatitoNeni::fitToWindow()
