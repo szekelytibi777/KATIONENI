@@ -59,10 +59,12 @@ void CetliDock::paintEvent(QPaintEvent *e)
 		p.drawImage(c.pos*scale , c.scaled(size*scale));
 	}
 #if 1
-	for (Cetli* hc : hooveredCetlies) {
-		QPoint po(hc->pos.x() - 1, hc->pos.y() - 1);
-		QSize s(hc->size().width() + 1, hc->size().height() + 1);
-		p.fillRect(QRect(po, s), QColor(255, 32, 0, 32));
+	if (mutexHoovered.tryLock()) {
+		for (Cetli* hc : hooveredCetlies) {
+			QPoint po(hc->pos.x() - 1, hc->pos.y() - 1);
+			QSize s(hc->size().width() + 1, hc->size().height() + 1);
+			p.fillRect(QRect(po, s), QColor(255, 32, 0, 32));
+		}
 	}
 	
 	if(hooveredGroup) {
@@ -498,8 +500,11 @@ void CetliDock::load()
 	QDir dir(cetliPath);
 	QStringList entries = dir.entryList();
 	clear();
-
-	hooveredCetlies.clear();
+	if (mutexHoovered.tryLock()) {
+		mutexHoovered.lock();
+		hooveredCetlies.clear();
+		mutexHoovered.unlock();
+	}
 	groups.clear();
 	hooveredGroup = 0;
 	SubArea::deleteAreas();

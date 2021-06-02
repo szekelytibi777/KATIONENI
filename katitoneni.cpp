@@ -9,7 +9,7 @@
 #endif
 
 
-bool KatitoNeni::editEnabled = false;
+bool KatitoNeni::editEnabled = true;
 QSize KatitoNeni::mainSize;
 KatitoNeni::KatitoNeni()
    : srcWorkArea(new SrcWorkArea(this))
