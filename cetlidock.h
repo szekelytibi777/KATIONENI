@@ -41,10 +41,12 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent * event);
 	virtual void mouseMoveEvent(QMouseEvent * event);
 	virtual void keyPressEvent(QKeyEvent * event);
+	virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void resizeEvent(QResizeEvent * event);
 private:
 	bool mouseDrag = false;
 	bool groupDrag = false;
+	bool shiftDown = false;
 	bool fixOrder;
 	float scale;
 	int areaWidth;
@@ -63,6 +65,7 @@ private:
 	void setHooveredGroup(QPoint& point);
 
 	QList<Cetli> cetlies;
+	QMutex mutexHoovered;
 	QList<Cetli*> hooveredCetlies;
 	QList<Group> groups;
 	Cetli *selected;

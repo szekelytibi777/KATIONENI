@@ -381,9 +381,11 @@
     <ClCompile Include="pageslist.cpp" />
     <ClCompile Include="processimage.cpp" />
     <ClCompile Include="srcworkarea.cpp" />
+    <ClCompile Include="SubArea.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cetli.h" />
+    <ClInclude Include="SubArea.h" />
     <QtMoc Include="cetlidock.h">
     </QtMoc>
     <QtMoc Include="dstworkarea.h">
