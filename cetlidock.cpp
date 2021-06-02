@@ -263,15 +263,15 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 		}
 	}
 
-	if (mouseDrag) {
+	if (mouseDrag && selected) {
 
 		QPoint newPos = mousePos + selected->dragOffset;
 		QPoint groupDrag = newPos - selected->pos;
 		//setProperty("pos", actPos);
-		if (selected) {
-			selected->pos = newPos;
-			selected->selected = false;
-		}
+		
+		selected->pos = newPos;
+		selected->selected = false;
+
 		if (selectedGroup) {
 			for (Cetli* c : *selectedGroup) {
 				if (c != selected) {
