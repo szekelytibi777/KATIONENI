@@ -7,56 +7,86 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QPropertyAnimation>
+#include <QMutex>
 #include "dstworkarea.h"
 #include "group.h"
+#include "SubAreas.h"
 class KatitoNeni;
+class ResultArea;
 
 class CetliDock : public QWidget
 {
     Q_OBJECT
 public:
 	explicit CetliDock(DstWorkArea *parent = nullptr);
-	void addCetli(QImage img, QPoint pos = QPoint(-1,-1));
+	virtual void addCetli(QImage img, QPoint pos = QPoint(-1,-1));
 	void shuffle();
 	void save( bool solved = false);
 	void load();
 	void clear();
+	void setResultArea(ResultArea* ra) { resultArea = ra; }
 	DstWorkArea *dstView;
 	QString cetliPath;
 	//Group selectedGroup();
-	void cleanupNeighbours(Cetli *cetli = 0);
+	//void cleanupNeighbours(Cetli *cetli = 0);
 	//QMap<Cetli *, Group>  groups;
 	void setAreaWidth(int w){
 		areaWidth = w*.85;
 	}
 
+	void clearGroups() {
+		for (Group& g : groups) {
+			g.clear();
+		}
+	}
+
+	Cetli* selected;
+
+	virtual bool hasCetlies() { return !cetlies.isEmpty(); }
+
 	void addToGroup(Cetli *c, Cetli* key = 0);
 	void removeFromGroup(Cetli *c);
 
 	void addToGroup(Cetli* c, Group& g);
+	bool paintEnabled;
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	virtual void mousePressEvent(QMouseEvent * event);
 	virtual void mouseReleaseEvent(QMouseEvent * event);
 	virtual void mouseMoveEvent(QMouseEvent * event);
+	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 	virtual void keyPressEvent(QKeyEvent * event);
 	virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void resizeEvent(QResizeEvent * event);
-private:
+
 	bool mouseDrag = false;
 	bool groupDrag = false;
 	bool shiftDown = false;
 	bool fixOrder;
 	float scale;
+	QList<Cetli> cetlies;
+	Cetli* hooveredCetli;
+
+
+	QList<Group> groups;
+	Group* hooveredGroup;
+	Group* selectedGroup;
+	SubAreas areas;
+
+private:
+
 	int areaWidth;
+	QPoint prevMousePos;
     QVector<QListWidgetItem> listItems;
     void fillImage(QImage &img, QRgb color);
     int rand(int min = 0, int max = RAND_MAX);
-	void walkNeighbours(Cetli* c, QList<Cetli*>& g);
+	//void walkNeighbours(Cetli* c, QList<Cetli*>& g);
 	void logCetlies();
+	Cetli* cetliOnPosition(const QPoint& pos);
 	QPoint offset;
 	QPropertyAnimation scrollAnimation;
+	ResultArea* resultArea;
 
 	void setHooveredCetlies(QRect &rect, Cetli* m);
 	void setHooveredCetlies(QPoint& point);
@@ -64,13 +94,13 @@ private:
 	void setHooveredGroup(QRect& rect);
 	void setHooveredGroup(QPoint& point);
 
-	QList<Cetli> cetlies;
-	QMutex mutexHoovered;
+
+	QRecursiveMutex  mutexPaint;
 	QList<Cetli*> hooveredCetlies;
-	QList<Group> groups;
-	Cetli *selected;
-	Group* hooveredGroup;
-	Group* selectedGroup;
+
+	
+
+	
 	void snap(Cetli* c0, Cetli *c1);
 	QPoint moveStart;
 	QPoint transformed(const QPoint &p);
@@ -82,6 +112,7 @@ private:
 	static Cetli nullCetli;
 
 	QPoint actPos;
+	
 signals:
 
 public slots:

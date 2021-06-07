@@ -9,8 +9,7 @@
 #include <QScrollArea>
 #include "helper.h"
 
-DstWorkArea::DstWorkArea(QWidget * parent)
- : QScrollArea(parent)
+DstWorkArea::DstWorkArea(QWidget * parent)// : QScrollArea(parent)
 
 // , scrollArea(new QScrollArea(this))
 {

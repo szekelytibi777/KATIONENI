@@ -19,6 +19,7 @@
 #include "katitoneni.h"
 #include <opencv2/core/core.hpp>
 #include "SubArea.h"
+#include "ResultArea.h"
 
 CetliDock::CetliDock(DstWorkArea* parent)
 	: QWidget(reinterpret_cast<QWidget*>(parent))
@@ -34,6 +35,10 @@ CetliDock::CetliDock(DstWorkArea* parent)
 	, hooveredGroup(0)
 	, selectedGroup(0)
 	, scrollAnimation(this, "pos")
+	, prevMousePos(QPoint(0,0))
+	, resultArea(0)
+	, hooveredCetli(0)
+	, paintEnabled(false)
 {
 	
 	resize(4000, 2000);
@@ -43,48 +48,63 @@ CetliDock::CetliDock(DstWorkArea* parent)
 
 void CetliDock::paintEvent(QPaintEvent *e)
 {
-	QPainter p;
-	p.begin(this);
-	p.fillRect(rect(),Qt::white);
-	int w = property("width").toInt()-3;
-	int h = property("height").toInt()-3;
+	if (paintEnabled) {
+		QPainter p;
 
-	SubArea::paintAreas(p);
+		p.begin(this);
+		p.fillRect(rect(), Qt::white);
+		int w = property("width").toInt() - 3;
+		int h = property("height").toInt() - 3;
 
-	for(int i = 0; i < cetlies.count(); i++){
-		Cetli &c = cetlies[i];
-		if(!c.isAlive)
-			continue;
-		QSize size = c.size();
-		p.drawImage(c.pos*scale , c.scaled(size*scale));
-	}
+		areas.paintAreas(p);
+
+		for (int i = 0; i < cetlies.count(); i++) {
+			Cetli& c = cetlies[i];
+			if (!c.isAlive)
+				continue;
+			QSize size = c.size();
+			p.drawImage(c.pos * scale, c.scaled(size * scale));
+		}
+
+
 #if 1
-	if (mutexHoovered.tryLock()) {
-		for (Cetli* hc : hooveredCetlies) {
-			QPoint po(hc->pos.x() - 1, hc->pos.y() - 1);
-			QSize s(hc->size().width() + 1, hc->size().height() + 1);
-			p.fillRect(QRect(po, s), QColor(255, 32, 0, 32));
-		}
-	}
-	
-	if(hooveredGroup) {
-		for (Cetli* c : *hooveredGroup) {
-			QPoint po(c->pos.x() - 1, c->pos.y() - 1);
-			QSize s(c->size().width() + 1, c->size().height() + 1);
-			p.fillRect(QRect(po, s), QColor(255, 64, 64, 64));
-		}
-	}
-	
 
-	if (selected) {
-		Cetli& c = *selected;
-		p.drawImage(c.pos * scale, c.scaled(c.size() * scale));
-		QPoint pt(c.pos.x() - 1, c.pos.y() - 1);
-		QSize s(c.size().width() + 1, c.size().height() + 1);
-		p.fillRect(QRect(pt, s), QColor(0, 255, 0, 64));
-	}
-	p.end();
+		if (true) {
+			if (hooveredCetli) {
+
+				QPoint po(hooveredCetli->pos.x() - 1, hooveredCetli->pos.y() - 1);
+				QSize s(hooveredCetli->width() + 1, hooveredCetli->height() + 1);
+				p.fillRect(QRect(po, s), QColor(64, 255, 64, 64));
+			}
+			for (Cetli* hc : hooveredCetlies) {
+				QPoint po(hc->pos.x() - 1, hc->pos.y() - 1);
+				QSize s(hc->size().width() + 1, hc->size().height() + 1);
+				p.fillRect(QRect(po, s), QColor(255, 32, 0, 32));
+			}
+			if (hooveredGroup) {
+				for (Cetli* c : *hooveredGroup) {
+					QPoint po(c->pos.x() - 1, c->pos.y() - 1);
+					QSize s(c->size().width() + 1, c->size().height() + 1);
+					p.fillRect(QRect(po, s), QColor(255, 64, 64, 64));
+				}
+			}
+
+
+			if (selected) {
+				Cetli& c = *selected;
+				p.drawImage(c.pos * scale, c.scaled(c.size() * scale));
+				QPoint pt(c.pos.x() - 1, c.pos.y() - 1);
+				QSize s(c.size().width() + 1, c.size().height() + 1);
+				p.fillRect(QRect(pt, s), QColor(0, 255, 0, 64));
+			}
+		}
+
+
+
 #endif
+		p.end();
+
+	}
 	QWidget::paintEvent(e);
 }
 
@@ -168,11 +188,31 @@ void CetliDock::reArrange()
 			rowHeight = 0;
 		}
 	}
-	cleanupNeighbours();
+	//cleanupNeighbours();
+}
+
+
+void CetliDock::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	if (!hasCetlies())
+		return;
+
+	if (event->button() == Qt::LeftButton)
+	{
+		ResultArea* ra = KatitoNeni::instance()->getResultArea();
+		assert(ra);
+		Cetli* cetli = cetliOnPosition(event->pos());
+		if (cetli) {
+			ra->addCetli(selected);
+		}
+	}
 }
 
 void CetliDock::mousePressEvent(QMouseEvent* event)
 {
+	if (!hasCetlies())
+		return;
+
 	if (event->button() == Qt::RightButton) {
 		if (hooveredGroup)
 			hooveredGroup->clear();
@@ -198,6 +238,19 @@ void CetliDock::mousePressEvent(QMouseEvent* event)
 	QWidget::mousePressEvent(event);
 }
 
+Cetli* CetliDock::cetliOnPosition(const QPoint& pos)
+{
+	Cetli* ret = 0;
+	for (Cetli& c : cetlies) {
+		QRect r(c.pos, c.size());
+		if (r.contains(pos)) {
+			ret = &c;
+			return ret;
+		}
+	}
+	return ret;
+}
+
 void CetliDock::scrollTimerUpdate()
 {
 
@@ -205,8 +258,10 @@ void CetliDock::scrollTimerUpdate()
 
 void CetliDock::mouseMoveEvent(QMouseEvent* event)
 {
+	if (!hasCetlies())
+		return;
 	static int count = 0;	hooveredCetlies.clear();
-	QPoint mousePos = transformed(event->pos());
+	QPoint mousePos = event->pos();//QPoint((int)event->screenPos().x(), (int)event->screenPos().y());
 	const int borderWidth = 10;
 	const int step = 100;
 	const int animDuration = 200;
@@ -216,14 +271,37 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 
 	QPoint cornerBtm = mapToGlobal(parent()->property("rect").toRect().bottomRight());
 	QPoint cornerTop = mapToGlobal(parent()->property("rect").toRect().topLeft());
-	QPoint cursorPoint = QCursor::pos();
+
 	
 	int tp = cornerTop.y() + borderWidth;
 	int bt = cornerBtm.y() - borderWidth;
 	int lf = cornerTop.x() + borderWidth;
 	int rt = cornerBtm.x() - borderWidth;
 
-	//qDebug() << lf << " " << cursorPoint << " " << rt;
+	int topTriggerValue = cornerTop.y() + borderWidth;
+	int bottomTriggerValue = cornerBtm.y() - borderWidth;
+	int leftTriggerValue = cornerTop.x() + borderWidth;
+	int rightTriggerValue = cornerBtm.x() - borderWidth;
+
+	bool topTrigger = (mousePos.y() < topTriggerValue) && (mousePos.y() > topTriggerValue);
+	bool bottomTrigger = (mousePos.y() > topTriggerValue) && (mousePos.y() < topTriggerValue);
+	bool leftTrigger = (mousePos.x() < leftTriggerValue) && (mousePos.x() > leftTriggerValue);
+#if 0
+	bool rightTrigger = (mousePos.x() > rightTriggerValue) && (mousePos.x() < rightTriggerValue);
+	qDebug() << prevMousePos << " top:" << topTriggerValue << " left:" << leftTriggerValue << " bottom:" << bottomTriggerValue << " right:"<< rightTriggerValue;
+	if (topTrigger) {
+		qDebug() << "TOP";
+	}
+	if (bottomTrigger) {
+		qDebug() << "BOTTOM";
+	}
+	if (leftTrigger) {
+		qDebug() << "LEFT";
+	}
+	if (rightTrigger) {
+		qDebug() << "RIGHT";
+	}
+	/*
 	if (cursorPoint.y()+offset.y() > bt) {
 		if (scrollAnimation.state() != QAbstractAnimation::Running) {
 			scrollAnimation.setDuration(animDuration);
@@ -264,7 +342,8 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 			offset.setX(offset.x() - step);
 		}
 	}
-
+	*/
+#endif
 	if (mouseDrag && selected) {
 
 		QPoint newPos = mousePos + selected->dragOffset;
@@ -295,17 +374,23 @@ void CetliDock::mouseMoveEvent(QMouseEvent* event)
 		setHooveredCetlies(mousePos);
 		setHooveredGroup(mousePos);
 	}
+	
+	//setHooveredCetlies(mousePos);
+	hooveredCetli = cetliOnPosition(mousePos);
+	if (hooveredCetli)
+		qDebug() << hooveredCetli;
 
-
+	prevMousePos = mousePos;
 	repaint();
 	
 	QWidget::mouseMoveEvent(event);
 }
 
 
+
 void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 {
-	if(cetlies.isEmpty())
+	if (!hasCetlies())
 		return;
 
 	mouseDrag = false;
@@ -313,7 +398,7 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 
 	
 	if (shiftDown && selected) {
-		SubArea* area = SubArea::area(mousePos);
+		SubArea* area = areas.area(mousePos);
 		if (area) {
 			selected->pos = area->actPos() + area->areaOffset();
 			area->allocSize(selected->size());
@@ -340,7 +425,7 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 				gp->addOnce(selected);
 				gp->addOnce(hc);
 				groups.push_back(g);
-				selected = 0;
+				selected = hooveredCetlies.back();
 			}
 		}
 
@@ -356,6 +441,8 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 			return;
 		}
 	}
+	//hooveredGroup = 0;
+	hooveredCetli = 0;
 	repaint();
 	QWidget::mouseReleaseEvent(event);
 }
@@ -391,33 +478,41 @@ void CetliDock::setHooveredCetlies(QPoint& point)
 
 void CetliDock::setHooveredGroup(QRect& rect)
 {
-	hooveredGroup = 0;
-	for (Group& g : groups) {
-		for (Cetli* c : g) {
-			QPoint p(c->pos.x() - 1, c->pos.y() - 1);
-			QSize s(c->size().width() + 1, c->size().height() + 1);
-			QRect r(p, s);
-			if (r.intersects(rect)) {
-				hooveredGroup = &g;
-				return;
+	if (true /* || mutexHoovered.tryLock(10)*/) {
+		//mutexHoovered.lock();
+		hooveredGroup = 0;
+		for (Group& g : groups) {
+			for (Cetli* c : g) {
+				QPoint p(c->pos.x() - 1, c->pos.y() - 1);
+				QSize s(c->size().width() + 1, c->size().height() + 1);
+				QRect r(p, s);
+				if (r.intersects(rect)) {
+					hooveredGroup = &g;
+					return;
+				}
 			}
 		}
+		//mutexHoovered.unlock();
 	}
 }
 
 void CetliDock::setHooveredGroup(QPoint& point)
 {
-	hooveredGroup = 0;
-	for (Group& g : groups) {
-		for (Cetli* c : g) {
-			QPoint p(c->pos.x() - 1, c->pos.y() - 1);
-			QSize s(c->size().width() + 1, c->size().height() + 1);
-			QRect r(p, s);
-			if (r.contains(point)) {
-				hooveredGroup = &g;
-				return ;
+	if (true /* || mutexHoovered.tryLock(10)*/) {
+		//mutexHoovered.lock();
+		hooveredGroup = 0;
+		for (Group& g : groups) {
+			for (Cetli* c : g) {
+				QPoint p(c->pos.x() - 1, c->pos.y() - 1);
+				QSize s(c->width() + 1, c->height() + 1);
+				QRect r(p, s);
+				if (r.contains(point)) {
+					hooveredGroup = &g;
+					return;
+				}
 			}
 		}
+		//mutexHoovered.unlock();
 	}
 }
 
@@ -463,7 +558,7 @@ void CetliDock::shuffle()
 	}
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::shuffle(cetlies.begin(), cetlies.end(), std::default_random_engine(seed));
-	reArrange();
+	//reArrange();
 	repaint();
 }
 
@@ -497,79 +592,91 @@ void CetliDock::save(bool solved)
 
 void CetliDock::load()
 {
-	QDir dir(cetliPath);
-	QStringList entries = dir.entryList();
-	clear();
-	if (mutexHoovered.tryLock()) {
-		mutexHoovered.lock();
+	paintEnabled = false;
+	if(true) {
+		
+		ResultArea* ra = KatitoNeni::instance()->getResultArea();
+		ra->paintEnabled = false;
+		ra->clear();
+		QDir dir(cetliPath);
+		QStringList entries = dir.entryList();
+		clear();
 		hooveredCetlies.clear();
-		mutexHoovered.unlock();
-	}
-	groups.clear();
-	hooveredGroup = 0;
-	SubArea::deleteAreas();
-	SubArea::createAreas(size(), 3, 4);
+
+		clearGroups();
+		ra->clearGroups();
+		selected = 0;
+		ra->selected = 0;
+		groups.clear();
+		hooveredGroup = 0;
+		areas.deleteAreas();
+		areas.createAreas(size(), 3, 4);
+
+		paintEnabled = true;
+		ra->paintEnabled = true;
 
 
-	QFile fp(QString("%1/positions.dat").arg(cetliPath));
-	QMap<QString, QPoint> map;
-	if (fp.open(QFile::ReadOnly)) {
-		QDataStream data(&fp);
-		while (!data.atEnd()) {
-			QString name;
-			QPoint pos;
-			data >> name >> pos;
-			qDebug() << name;
-			map[name] = pos;
+		QFile fp(QString("%1/positions.dat").arg(cetliPath));
+		QMap<QString, QPoint> map;
+		if (fp.open(QFile::ReadOnly)) {
+			QDataStream data(&fp);
+			while (!data.atEnd()) {
+				QString name;
+				QPoint pos;
+				data >> name >> pos;
+				map[name] = pos;
+			}
+			fp.close();
 		}
-		fp.close();
-	}
 
-	QString fn = QString("%1/solution.txt").arg(cetliPath);
-	QFile f(fn);
-	if(f.open(QFile::ReadOnly)){
-		QString s = QString(f.readAll());
-		QStringList lines = s.split("\r\n");
-		foreach(const QString &l, lines){
-			int i = l.indexOf(":");
-			QStringList names = l.mid(i+1).split(",");
-			foreach(const QString n, names){
-				QString e = n.trimmed() + ".png";
-				QString p = QString("%1/%2").arg(cetliPath).arg(e);
-				QImageReader reader(p);
-				QImage img = reader.read();
-				if(!img.isNull())
-				{
-					QSize s = img.size() * scale;
-					if (map.find(e) != map.end())
-						addCetli(img.scaled(s), map[e]);
-					else
-						addCetli(img.scaled(s));
+		QString fn = QString("%1/solution.txt").arg(cetliPath);
+		QFile f(fn);
+		if (f.open(QFile::ReadOnly)) {
+			QString s = QString(f.readAll());
+			QStringList lines = s.split("\r\n");
+			foreach(const QString & l, lines) {
+				int i = l.indexOf(":");
+				QStringList names = l.mid(i + 1).split(",");
+				foreach(const QString n, names) {
+					QString e = n.trimmed() + ".png";
+					QString p = QString("%1/%2").arg(cetliPath).arg(e);
+					QImageReader reader(p);
+					QImage img = reader.read();
+					if (!img.isNull())
+					{
+						QSize s = img.size() * scale;
+						if (map.find(e) != map.end())
+							addCetli(img.scaled(s), map[e]);
+						else
+							addCetli(img.scaled(s));
+					}
 				}
 			}
 		}
-	}
-	else{
-		for(int i = 0; i < entries.size();i++)
-		{
-			QString &entry = entries[i];
-			if(entry.contains(".png"))
+		else {
+			for (int i = 0; i < entries.size(); i++)
 			{
-				QString p = QString("%1/%2").arg(cetliPath).arg(entry);
-				QImageReader reader(p);
-				QImage img = reader.read();
-				if(!img.isNull())
+				QString& entry = entries[i];
+				if (entry.contains(".png"))
 				{
-					QSize s = img.size() * scale;
-					QString key = entry.trimmed().remove(".png");
-					if (map.find(key) != map.end())
-						addCetli(img, map[key]);
-					else
-						addCetli(img);
+					QString p = QString("%1/%2").arg(cetliPath).arg(entry);
+					QImageReader reader(p);
+					QImage img = reader.read();
+					if (!img.isNull())
+					{
+						QSize s = img.size() * scale;
+						QString key = entry.trimmed().remove(".png");
+						if (map.find(key) != map.end())
+							addCetli(img, map[key]);
+						else
+							addCetli(img);
+					}
 				}
 			}
 		}
+
 	}
+	
 }
 
 void CetliDock::snap(Cetli* c0, Cetli* c1)
@@ -620,35 +727,6 @@ void CetliDock::clear()
 		selected = 0;
 	}
 	update();
-}
-
-void CetliDock::walkNeighbours(Cetli *c, QList<Cetli*> &g)
-{
-	if(c && !g.contains(c)){
-		g.push_back(c);
-	}
-	else
-		return;
-
-	for(int i = 0; i<4; i++)
-		if(c->neigbour[i])
-			walkNeighbours(c->neigbour[i], g);
-}
-
-void CetliDock::cleanupNeighbours(Cetli *cetli)
-{
-	if(cetli){
-		for(int j = 0; j < 4; j++)
-			cetli->neigbour[j] = 0;
-	}
-	else{
-		for(int i = 0; i < cetlies.count(); i++){
-			Cetli &c = cetlies[i];
-			for(int j = 0; j < 4; j++){
-				c.neigbour[j] = 0;
-			}
-		}
-	}
 }
 
 QPoint CetliDock::transformed(const QPoint &p)

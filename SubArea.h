@@ -1,22 +1,19 @@
 #pragma once
 #include <QRect>
-#include <QPoint>
-#include <QPainter>
-#include <QVector>
+class QPoint;
+class QSize;
+class QPainter;
 class SubArea
 {
 public:
-	SubArea(const QRect& rect);
-	SubArea(const SubArea& sa);
+	SubArea(const SubArea& other);
+	SubArea(const QRect &r);
+
 	const QRect rect()const { return rect_; }
 	QPoint& actPos() { return actPos_; }
 	QPoint areaOffset() { return rect_.topLeft(); }
 	void allocSize(const QSize& size);
-	static QVector<SubArea*> areas;
-	static SubArea* area(const QPoint& point);
-	static void createAreas(const QSize& parentArea, int numHorisontal, int numVertical);
-	static void paintAreas(QPainter &painter);
-	static void deleteAreas();
+	
 
 private:
 	const QRect rect_;

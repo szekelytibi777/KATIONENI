@@ -80,6 +80,15 @@
     <ClCompile Include="Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SubAreas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResultWorkArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResultArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SubArea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,17 +124,12 @@
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SubAreas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="SubArea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="debug\moc_predefs.h.cbt">
-      <Filter>Generated Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="release\moc_predefs.h.cbt">
-      <Filter>Generated Files</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\applicationIcon.ico">
@@ -179,5 +183,13 @@
     <Text Include="KatitoNeni.log">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ResultArea.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ResultWorkArea.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

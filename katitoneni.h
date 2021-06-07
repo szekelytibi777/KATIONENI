@@ -75,6 +75,8 @@ class QToolBar;
 class QListWidgetItem;
 class SrcWorkArea;
 class DstWorkArea;
+class ResultWorkArea;
+class ResultArea;
 class CetliDock;
 class QCheckBox;
 class QSlider;
@@ -92,16 +94,21 @@ public:
 	void setPixel(const QPoint &p, bool update = false);
 	void findEdges(const QPoint&p, int& top, int & bottom, int &left, int &right );
 	int walkToEdge(const QPoint startPos, int xDir, int yDir);
-	int radius();
 	float scale;
 	Log logToFile;
 	static bool editEnabled;
 	static QSize mainSize;
+	static KatitoNeni* instance();
+	CetliDock* getCetliDock() {	return cetliDock; }
+	ResultArea* getResultArea() { return resultArea; }
+	void setResultArea(ResultArea* ra) { resultArea = ra; }
 protected:
 	virtual void resizeEvent(QResizeEvent* event);
 public slots:
 	void onItemDoubleClicked(QListWidgetItem *);
 	void onCetliScaleChanged(int v);
+
+signals:
 
 private slots:
 	void openDir();
@@ -110,28 +117,30 @@ private slots:
 	void alterSlicers();
 	void saveCetlies();
 private:
+	static KatitoNeni* instance_;
+
+
 	QAction *createToolbarAction(const QString &iconFileName, const QString &name, const QString &toolTip,  const char*  method);
 	void refreshSrcImage();
 	void setSlicers();
     void createActions();
-    void createMenus();
 	QCheckBox *cb;
 	QSlider *sliderCetliScale;
 
 	void setImage(const QString &imagePath);
 	bool loadCetlies();
 
-    void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
 	int slicerState;
-	bool fixOrder();
 
 	QImage srcImage;
+	ResultWorkArea* resultWorkArea;
 	SrcWorkArea *srcWorkArea;
 	DstWorkArea *dstWorkArea;
 	CetliDock *cetliDock;
-	QScrollArea * scrollArea[3];
+	ResultArea* resultArea;
+	QScrollArea * scrollArea[4];
 	QSplitter *splitter;
 	PagesList *pagesList;
     double scaleFactor;

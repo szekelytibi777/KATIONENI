@@ -1,6 +1,8 @@
 #include "katitoneni.h"
 #include "pageslist.h"
 #include "srcworkarea.h"
+#include "ResultWorkArea.h"
+#include  "ResultArea.h"
 #include "cetlidock.h"
 #include <QtWidgets>
 
@@ -11,10 +13,19 @@
 
 bool KatitoNeni::editEnabled = true;
 QSize KatitoNeni::mainSize;
+KatitoNeni* KatitoNeni::instance_ = 0;
+KatitoNeni* KatitoNeni::instance()
+{
+	assert(KatitoNeni::instance_);
+	return KatitoNeni::instance_;
+}
+
 KatitoNeni::KatitoNeni()
-   : srcWorkArea(new SrcWorkArea(this))
+   : resultWorkArea(new ResultWorkArea(this))
+   , srcWorkArea(new SrcWorkArea(this))
    , dstWorkArea(new DstWorkArea(this))
    , cetliDock(new CetliDock(dstWorkArea))
+   , resultArea(new ResultArea(resultWorkArea))
    , splitter(new QSplitter(this))
    , pagesList(new PagesList(this))
    , toolBar(new QToolBar(this))
@@ -26,15 +37,18 @@ KatitoNeni::KatitoNeni()
    , scaleFactor(1.0)
    , logToFile()
 {
+	KatitoNeni::instance_ = this;
 	createActions();
 	scrollArea[0] = new QScrollArea;
 	scrollArea[1] = new QScrollArea;
 	scrollArea[2] = dstWorkArea;
+	scrollArea[3] = resultWorkArea;
 
 
 	splitter->addWidget(scrollArea[0]);
 	splitter->addWidget(scrollArea[1]);
 	splitter->addWidget(scrollArea[2]);
+	splitter->addWidget(scrollArea[3]);
 
 	QString path = QDir::currentPath()+"/SCANNEDPAGES/oldal003.jpg";
 	actImagePath = "";// settings.value("actImagePath", path).toString();
@@ -79,6 +93,7 @@ KatitoNeni::KatitoNeni()
 	scrollArea[0]->layout()->addWidget(pagesList);
 
 	scrollArea[2]->setWidget(cetliDock);
+	scrollArea[3]->setWidget(resultArea);
 	pagesList->updateList();//onPagesPathChanged("c:/Users/szekelytibi/Documents/WORK/KATITONENI/SCANNEDPAGES");
 
 	connect(pagesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onItemDoubleClicked(QListWidgetItem *)));
@@ -296,7 +311,7 @@ void  KatitoNeni::setSlicers()
 {
 	int s = (width()-200)/2;
 	QList<int> iSizes;
-
+	/*
 	switch(slicerState){
 		case 0:
 			iSizes << 200 << s << s;
@@ -314,7 +329,9 @@ void  KatitoNeni::setSlicers()
 			cetliDock->setAreaWidth(width()-200);
 			break;
 	}
+	*/
 
+	iSizes << 200 << s << s << s;
 	splitter->setSizes(iSizes);
 
 }

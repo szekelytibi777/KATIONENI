@@ -11,8 +11,8 @@
 #include <QDragLeaveEvent>
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include <QMutex>
-#include <QMutexLocker>
+//#include <QMutex>
+//#include <QMutexLocker>
 #include <QMap>
 #include "helper.h"
 
@@ -24,17 +24,12 @@ public:
 
 
 protected:
-
-
-
 private:
-
 
 	QPoint moveStart;
 	QScrollArea *scrollArea;
 	Helper helper;
 	int elapsed;
-
 
 public slots:
 	void animate();
