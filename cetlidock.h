@@ -49,6 +49,7 @@ public:
 
 	void addToGroup(Cetli* c, Group& g);
 	bool paintEnabled;
+	bool positionsAreLoaded = false;
 
 protected:
 	void paintEvent(QPaintEvent *event) override;

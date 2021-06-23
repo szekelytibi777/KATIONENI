@@ -21,11 +21,9 @@ KatitoNeni* KatitoNeni::instance()
 }
 
 KatitoNeni::KatitoNeni()
-   //: resultWorkArea(new ResultWorkArea(this))
    : srcWorkArea(new SrcWorkArea(this))
    , dstWorkArea(new DstWorkArea(this))
    , cetliDock(new CetliDock(dstWorkArea))
-   //, resultArea(new ResultArea(resultWorkArea))
    , splitter(new QSplitter(this))
    , pagesList(new PagesList(this))
    , toolBar(new QToolBar(this))
@@ -42,7 +40,7 @@ KatitoNeni::KatitoNeni()
 	scrollArea[0] = new QScrollArea;
 	scrollArea[1] = new QScrollArea;
 	scrollArea[2] = dstWorkArea;
-	scrollArea[3] = resultWorkArea;
+	scrollArea[3] = 0;
 
 	
 	if (KatitoNeni::editEnabled) {
@@ -231,6 +229,7 @@ void KatitoNeni::createActions()
 	else
 	{
 		toolBar->addAction(createToolbarAction("save.png", tr("&Save"), tr("Cetlik mentése"), SLOT(saveCetlies())));
+		toolBar->addAction(createToolbarAction("sidebar.png", tr("&Toggle"), tr("Oldalak elrejtése"), SLOT(toggleSlicers())));
 	}
 }
 
@@ -322,14 +321,18 @@ void KatitoNeni::alterSlicers()
 	setSlicers();
 }
 
-void  KatitoNeni::setSlicers()
+void  KatitoNeni::setSlicers(bool toggle)
 {
 	int s = (width()-220)/2;
 	QList<int> iSizes;
-	if (KatitoNeni::editEnabled)
-		iSizes << 220 << s << s;
-	else
-		iSizes << 220 << 0 << width() - 220;
+	if (KatitoNeni::editEnabled) {
+		iSizes << (toggle ? 220 : 0) << s << s;
+	}
+	else {
+		iSizes << (toggle ? 220 : 0) << 0 << width() - 220;
+
+	}
+
 
 
 	splitter->setSizes(iSizes);
@@ -338,6 +341,12 @@ void  KatitoNeni::setSlicers()
 void KatitoNeni::saveCetlies()
 {
 	cetliDock->save(true);
+}
+
+void KatitoNeni::toggleSlicers()
+{
+	setSlicers(toggleState);
+	toggleState = !toggleState;
 }
 
 bool KatitoNeni::loadCetlies()

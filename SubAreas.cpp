@@ -39,24 +39,26 @@ SubArea* SubAreas::area(const int index)
 	assert(index < areas.size());
 	return areas[index];
 }
-void SubAreas::createAreas(const QSize& parentArea, int numHorisontal, int numVertical)
-{
-	
+void SubAreas::createAreas(const QSize& parentArea, bool area0)
+{	
 
-	
-	int stepX = parentArea.width() / (numHorisontal*2);
-
-	int stepY = parentArea.height() / numVertical;
-	//areas.push_back(new SubArea(QRect(0, 0, area0W, parentArea.height())));
-	
-	int width = parentArea.width()/2;
-	for (int y = 0; y < parentArea.height(); y += stepY) {
-		for (int x = 0; x < parentArea.width(); x += stepX) {
-			SubArea *a = new SubArea(QRect(x, y, stepX, stepY));
-			areas.push_back(a);
-		}
-		stepX = parentArea.width() / numHorisontal;
-
+	int w = parentArea.width() / 15;
+	int h = parentArea.height() / 5;
+	if (area0) {
+		areas.push_back(new SubArea(QRect(0, 0, w, parentArea.height())));
+	}
+	else
+		w = 0;
+	int stepX = parentArea.width() / 6;
+	int stepY = parentArea.height() / 3;
+	areas.push_back(new SubArea(QRect(0, 0, w, parentArea.height())));
+	for(int i = w;  i < parentArea.width()-w; i+=stepX){
+		areas.push_back(new SubArea(QRect(i, 0, stepX, h)));
+	}
+	//int width = parentArea.width()/2;
+	for (int y = h; y < parentArea.height(); y += stepY) {
+		SubArea *a = new SubArea(QRect(w, y, parentArea.width()-w, stepY));
+		areas.push_back(a);
 	}
 }
 

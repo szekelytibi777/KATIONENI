@@ -116,13 +116,14 @@ private slots:
 	void shuffle();
 	void alterSlicers();
 	void saveCetlies();
+	void toggleSlicers();
 private:
 	static KatitoNeni* instance_;
 
 
 	QAction *createToolbarAction(const QString &iconFileName, const QString &name, const QString &toolTip,  const char*  method);
 	void refreshSrcImage();
-	void setSlicers();
+	void setSlicers(bool toggle=true);
     void createActions();
 	QCheckBox *cb;
 	QSlider *sliderCetliScale;
@@ -135,11 +136,13 @@ private:
 	int slicerState;
 
 	QImage srcImage;
-	ResultWorkArea* resultWorkArea;
+
 	SrcWorkArea *srcWorkArea;
 	DstWorkArea *dstWorkArea;
 	CetliDock *cetliDock;
-	//ResultArea* resultArea;
+
+	bool toggleState = true;
+
 	QScrollArea * scrollArea[4];
 	QSplitter *splitter;
 	PagesList *pagesList;

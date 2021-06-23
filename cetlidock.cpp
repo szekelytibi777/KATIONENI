@@ -35,15 +35,16 @@ CetliDock::CetliDock(DstWorkArea* parent)
 	, hooveredGroup(0)
 	, selectedGroup(0)
 	, scrollAnimation(this, "pos")
-	, prevMousePos(QPoint(0,0))
+	, prevMousePos(QPoint(0, 0))
 	, resultArea(0)
 	, hooveredCetli(0)
 	, paintEnabled(false)
 {
-	
+
 	resize(4000, 2000);
 	grabKeyboard();
 	setMouseTracking(true);
+	areas.createAreas(size());
 }
 
 void CetliDock::paintEvent(QPaintEvent *e)
@@ -149,12 +150,13 @@ void CetliDock::addCetli(QImage img, QPoint pos)
 {
 	SubArea* area = areas.area(0);
 
-	QPoint& p = pos;
-	if (p.x() < 0)
-		p = actPos;
+	bool alloc = pos == QPoint(-1, -1);
+	
 	Cetli c(img, QString("cetli%1").arg(cetlies.count(), 3, 10, QLatin1Char('0')), pos);
-	c.pos = area->actPos() + area->areaOffset();
-	area->allocSize(c.imgScaled.size());
+	c.pos = alloc ? area->actPos() + area->areaOffset() : pos ;
+	if (alloc)
+		area->allocSize(c.imgScaled.size());
+	qDebug() << c.pos;
 	cetlies.push_back(c);
 	repaint();
 }
@@ -613,23 +615,30 @@ void CetliDock::load()
 		groups.clear();
 		hooveredGroup = 0;
 		areas.deleteAreas();
-		areas.createAreas(size(), 3, 4);
+		
 
 		paintEnabled = true;
 
-
+		int offsx = 0;
 		QFile fp(QString("%1/positions.dat").arg(cetliPath));
 		QMap<QString, QPoint> map;
 		if (fp.open(QFile::ReadOnly)) {
+			offsx = width() / 15;
 			QDataStream data(&fp);
 			while (!data.atEnd()) {
 				QString name;
 				QPoint pos;
 				data >> name >> pos;
+				qDebug() << name << pos;
+				pos.setX(pos.x() - offsx);
 				map[name] = pos;
 			}
 			fp.close();
+			areas.createAreas(size());
+			
 		}
+		else
+			areas.createAreas(size(),true);
 
 		QString fn = QString("%1/solution.txt").arg(cetliPath);
 		QFile f(fn);
@@ -753,6 +762,8 @@ void CetliDock::remove(int id)
 
 void CetliDock::clear()
 {
+	areas.deleteAreas();
+	areas.createAreas(size());
 	actPos = QPoint(0,50);
 	rowHeight = 0;
 	cetlies.clear();

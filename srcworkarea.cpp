@@ -7,7 +7,6 @@ SrcWorkArea::SrcWorkArea(KatitoNeni *parent)
 	, katitoNeni(parent)
 
 {
-
 }
 
 void SrcWorkArea::mousePressEvent(QMouseEvent * event)

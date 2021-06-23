@@ -17,7 +17,7 @@ public:
 	void allocSize(const QSize& size);
 	SubArea* area(const QPoint& point);
 	SubArea* area(const int index);
-	void createAreas(const QSize& parentArea, int numHorisontal, int numVertical);
+	void createAreas(const QSize& parentArea, bool area0 = false);
 	void paintAreas(QPainter &painter);
 	void deleteAreas();
 

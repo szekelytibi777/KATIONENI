@@ -380,7 +380,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pageslist.cpp" />
     <ClCompile Include="processimage.cpp" />
-    <ClCompile Include="ResultWorkArea.cpp" />
     <ClCompile Include="srcworkarea.cpp" />
     <ClCompile Include="SubArea.cpp" />
     <ClCompile Include="SubAreas.cpp" />
@@ -388,7 +387,6 @@
   <ItemGroup>
     <ClInclude Include="cetli.h" />
     <QtMoc Include="ResultArea.h" />
-    <QtMoc Include="ResultWorkArea.h" />
     <ClInclude Include="SubArea.h" />
     <ClInclude Include="SubAreas.h" />
     <QtMoc Include="cetlidock.h">
