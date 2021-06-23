@@ -87,6 +87,7 @@ private:
 	QPoint offset;
 	QPropertyAnimation scrollAnimation;
 	ResultArea* resultArea;
+	bool deleteSelected = false;
 
 	void setHooveredCetlies(QRect &rect, Cetli* m);
 	void setHooveredCetlies(QPoint& point);

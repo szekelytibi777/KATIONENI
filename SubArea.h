@@ -13,6 +13,7 @@ public:
 	QPoint& actPos() { return actPos_; }
 	QPoint areaOffset() { return rect_.topLeft(); }
 	void allocSize(const QSize& size);
+	void reset() {	actPos_ = QPoint(0, 0); maxY = 0; }
 	
 
 private:

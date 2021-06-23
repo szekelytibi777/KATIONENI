@@ -1,4 +1,4 @@
-#include "ResultArea.h"
+//#include "ResultArea.h"
 #include "ResultWorkArea.h"
 #include "SubArea.h"
 #include <QKeyEvent>
@@ -18,31 +18,12 @@ ResultArea::ResultArea(ResultWorkArea* parent)
 	areas.createAreas(size(), 2, 4);
 	
 }
-/*
-void ResultArea::paintEvent(QPaintEvent* e)
-{
-	QPainter p;
-	p.begin(this);
 
-	p.fillRect(rect(), QColor(240,255,240));
-	areas.paintAreas(p);
-	for (Cetli &c : cetlies) {
-		if (!c.isAlive)
-			continue;
-		QSize size = c.size();
-		p.drawImage(c.pos, c.scaled(size));
-	}
-	p.end();
-
-
-	QWidget::paintEvent(e);
-}
-*/
 
 void ResultArea::mouseMoveEvent(QMouseEvent* event)
 {
 	repaint();
-	qDebug() << event->localPos() << " "<< event->pos();
+	
 	CetliDock::mouseMoveEvent(event);
 }
 

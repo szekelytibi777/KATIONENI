@@ -34,8 +34,10 @@ public:
 		bool  r = this == &b;
 		return r;
 	}
-	Cetli* neigbour[4];
-	//Cetli* groupKey;
+
+	QImage imgScaled;
+	QRect scaledRect();
+	QSize scaledSize();
 private :
 	static int idCount;
 };

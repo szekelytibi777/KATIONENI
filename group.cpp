@@ -7,8 +7,10 @@ Group::Group(CetliDock *dock)
 
 void Group::addOnce(Cetli *c)
 {
-	if(!contains(c))
-		push_back(c);
+	if (size() < 2) {
+		if (!contains(c))
+			push_back(c);
+	}
 }
 
 

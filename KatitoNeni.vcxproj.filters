@@ -86,9 +86,6 @@
     <ClCompile Include="ResultWorkArea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResultArea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SubArea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

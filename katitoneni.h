@@ -76,7 +76,7 @@ class QListWidgetItem;
 class SrcWorkArea;
 class DstWorkArea;
 class ResultWorkArea;
-class ResultArea;
+//class ResultArea;
 class CetliDock;
 class QCheckBox;
 class QSlider;
@@ -100,8 +100,8 @@ public:
 	static QSize mainSize;
 	static KatitoNeni* instance();
 	CetliDock* getCetliDock() {	return cetliDock; }
-	ResultArea* getResultArea() { return resultArea; }
-	void setResultArea(ResultArea* ra) { resultArea = ra; }
+	//ResultArea* getResultArea() { return resultArea; }
+	//void setResultArea(ResultArea* ra) { resultArea = ra; }
 protected:
 	virtual void resizeEvent(QResizeEvent* event);
 public slots:
@@ -139,7 +139,7 @@ private:
 	SrcWorkArea *srcWorkArea;
 	DstWorkArea *dstWorkArea;
 	CetliDock *cetliDock;
-	ResultArea* resultArea;
+	//ResultArea* resultArea;
 	QScrollArea * scrollArea[4];
 	QSplitter *splitter;
 	PagesList *pagesList;

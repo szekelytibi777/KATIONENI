@@ -11,7 +11,7 @@
 #endif
 
 
-bool KatitoNeni::editEnabled = true;
+bool KatitoNeni::editEnabled = false;
 QSize KatitoNeni::mainSize;
 KatitoNeni* KatitoNeni::instance_ = 0;
 KatitoNeni* KatitoNeni::instance()
@@ -21,11 +21,11 @@ KatitoNeni* KatitoNeni::instance()
 }
 
 KatitoNeni::KatitoNeni()
-   : resultWorkArea(new ResultWorkArea(this))
-   , srcWorkArea(new SrcWorkArea(this))
+   //: resultWorkArea(new ResultWorkArea(this))
+   : srcWorkArea(new SrcWorkArea(this))
    , dstWorkArea(new DstWorkArea(this))
    , cetliDock(new CetliDock(dstWorkArea))
-   , resultArea(new ResultArea(resultWorkArea))
+   //, resultArea(new ResultArea(resultWorkArea))
    , splitter(new QSplitter(this))
    , pagesList(new PagesList(this))
    , toolBar(new QToolBar(this))
@@ -44,11 +44,26 @@ KatitoNeni::KatitoNeni()
 	scrollArea[2] = dstWorkArea;
 	scrollArea[3] = resultWorkArea;
 
+	
+	if (KatitoNeni::editEnabled) {
+		splitter->addWidget(scrollArea[0]);
+		splitter->addWidget(scrollArea[1]);
+		splitter->addWidget(scrollArea[2]);
+	}
+	else {
+		splitter->addWidget(scrollArea[0]);
+		splitter->addWidget(scrollArea[1]);
+		splitter->addWidget(scrollArea[2]);
+		//splitter->addWidget(scrollArea[3]);
+		//scrollArea[0]->hide();
+		//scrollArea[1]->hide();
+		//scrollArea[2]->hide();
+		//scrollArea[3]->hide();
+	}
 
-	splitter->addWidget(scrollArea[0]);
-	splitter->addWidget(scrollArea[1]);
-	splitter->addWidget(scrollArea[2]);
-	splitter->addWidget(scrollArea[3]);
+
+	
+
 
 	QString path = QDir::currentPath()+"/SCANNEDPAGES/oldal003.jpg";
 	actImagePath = "";// settings.value("actImagePath", path).toString();
@@ -93,7 +108,7 @@ KatitoNeni::KatitoNeni()
 	scrollArea[0]->layout()->addWidget(pagesList);
 
 	scrollArea[2]->setWidget(cetliDock);
-	scrollArea[3]->setWidget(resultArea);
+	//scrollArea[3]->setWidget(resultArea);
 	pagesList->updateList();//onPagesPathChanged("c:/Users/szekelytibi/Documents/WORK/KATITONENI/SCANNEDPAGES");
 
 	connect(pagesList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onItemDoubleClicked(QListWidgetItem *)));
@@ -309,29 +324,14 @@ void KatitoNeni::alterSlicers()
 
 void  KatitoNeni::setSlicers()
 {
-	int s = (width()-200)/2;
+	int s = (width()-220)/2;
 	QList<int> iSizes;
-	/*
-	switch(slicerState){
-		case 0:
-			iSizes << 200 << s << s;
-			cetliDock->setAreaWidth(s);
-			break;
-		case 1:
-			iSizes << 200 << 0 << width()-200;
-			cetliDock->setAreaWidth(width()-200);
-			break;
-		case 2:
-			iSizes << 200 << width()-200 << 0;
-			break;
-		case 3:
-			iSizes << 0 << 0 << width();
-			cetliDock->setAreaWidth(width()-200);
-			break;
-	}
-	*/
+	if (KatitoNeni::editEnabled)
+		iSizes << 220 << s << s;
+	else
+		iSizes << 220 << 0 << width() - 220;
 
-	iSizes << 200 << s << s << s;
+
 	splitter->setSizes(iSizes);
 
 }

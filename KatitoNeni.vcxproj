@@ -380,7 +380,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pageslist.cpp" />
     <ClCompile Include="processimage.cpp" />
-    <ClCompile Include="ResultArea.cpp" />
     <ClCompile Include="ResultWorkArea.cpp" />
     <ClCompile Include="srcworkarea.cpp" />
     <ClCompile Include="SubArea.cpp" />

@@ -41,14 +41,22 @@ SubArea* SubAreas::area(const int index)
 }
 void SubAreas::createAreas(const QSize& parentArea, int numHorisontal, int numVertical)
 {
-	int stepX = parentArea.width() / numHorisontal;
-	int stepY = parentArea.height() / numVertical;
+	
 
-	for (int x = 0; x < parentArea.width(); x += stepX) {
-		for (int y = 0; y < parentArea.height(); y += stepY) {
+	
+	int stepX = parentArea.width() / (numHorisontal*2);
+
+	int stepY = parentArea.height() / numVertical;
+	//areas.push_back(new SubArea(QRect(0, 0, area0W, parentArea.height())));
+	
+	int width = parentArea.width()/2;
+	for (int y = 0; y < parentArea.height(); y += stepY) {
+		for (int x = 0; x < parentArea.width(); x += stepX) {
 			SubArea *a = new SubArea(QRect(x, y, stepX, stepY));
 			areas.push_back(a);
 		}
+		stepX = parentArea.width() / numHorisontal;
+
 	}
 }
 

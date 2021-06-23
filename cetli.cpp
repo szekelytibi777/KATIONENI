@@ -7,14 +7,23 @@ Cetli::Cetli(const QImage &img,const QString &n, const QPoint &_pos)
 	, uID(idCount++)
 	, name(n)
 	, isAlive(true)
+	, imgScaled(scaled(size()*0.75))
 	//, groupKey(0)
 {
-	neigbour[LEFT] = 0;
-	neigbour[RIGHT] = 0;
-	neigbour[TOP] = 0;
-	neigbour[BOTTOM] = 0;
+	
 	if(isNull())
 		uID = -1;
+}
+
+QRect Cetli::scaledRect()
+{
+	return imgScaled.rect();
+
+}
+
+QSize Cetli::scaledSize()
+{
+	return imgScaled.size();
 }
 
 void Cetli::scale(float scale)
