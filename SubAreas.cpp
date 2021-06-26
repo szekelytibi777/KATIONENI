@@ -108,21 +108,29 @@ void SubAreas::paintAreas(QPainter& painter)
 	}
 }
 
-void SubAreas::adjustX(int oldX, int newX)
+SubArea* SubAreas::adjustX(int oldX, int newX)
 {
-	for (SubArea* a : areas) {
+	SubArea* ret = 0;
+	for (int i = 0; i < areas.size();i++) {
+		SubArea* a = areas[i];
+		SubArea* nextArea = i + 1 < areas.size() ? areas[i + 1] : 0;
 		QRect r = a->rect();
-		qDebug() << r.left();
 		if (abs(r.left() - oldX) < 5) {
 			int x = r.left();
 			int y = r.top();
 			int w = r.width();
 			int h = r.height();
 			x = newX;
-			w +=  oldX - newX;
 			a->changeRect(QRect(x, y, w, h));
+			if (nextArea && nextArea->rect().top() == a->rect().top()) {
+				int ox = newX - oldX;
+				QRect r2 = nextArea->rect();
+				nextArea->changeRect(QRect(r2.left()+ox, r2.top(), r2.width(), r2.height()));
+				ret = nextArea;
+			}
 		}
 	}
+	return ret;
 }
 
 void SubAreas::adjustY(int oldY, int newY)
@@ -138,6 +146,13 @@ void SubAreas::adjustY(int oldY, int newY)
 			h += oldY - newY;
 			a->changeRect(QRect(x, y, w, h));
 		}
+	}
+}
+
+void SubAreas::rearrangeAreaContents(QList<Cetli>& cetlies)
+{
+	for (SubArea* a : areas) {
+		a->rearrangeContent(cetlies);
 	}
 }
 

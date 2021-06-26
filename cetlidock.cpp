@@ -174,10 +174,17 @@ void CetliDock::attachToArea(Cetli& cetli, bool rearrangePrevArea) {
 			int oldX = areas.area(0)->rect().right() + 1;
 			QSize s = areas.area(0)->getContentsBoud(cetlies);
 			int newX = s.width();
+
 			if (abs(oldX-newX) > 10) {
-				areas.adjustX(oldX, newX);
-				//reArrange(prevArea);
+				//currentArea->rearrangeContent(cetlies);
+				SubArea *area2 = areas.adjustX(oldX, newX);
+				/*
+				if (area2) {
+					area2->rearrangeContent(cetlies);
+				}
+				*/
 			}
+			areas.rearrangeAreaContents(cetlies);
 		}
 		if (currentArea) {
 			currentArea->rearrangeContent(cetlies);
@@ -667,7 +674,7 @@ void CetliDock::load()
 				map[name] = pos;
 			}
 			fp.close();
-			areas.createAreas(size(),true);
+			areas.createAreas(size(),false);
 			
 		}
 		else

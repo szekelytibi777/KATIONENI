@@ -22,9 +22,9 @@ public:
 	void paintAreas(QPainter &painter);
 	void deleteAreas();
 	void resizeArea(QSize& newSize, int areaIdx = 0);
-	void adjustX(int oldX, int newX);
+	SubArea* adjustX(int oldX, int newX);
 	void adjustY(int oldY, int newY);
-	void rearrangeContent();
+	void rearrangeAreaContents(QList<Cetli>& cetlies);
 
 private:
 	QVector<SubArea*> areas;
