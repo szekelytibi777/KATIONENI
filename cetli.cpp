@@ -7,7 +7,7 @@ Cetli::Cetli(const QImage &img,const QString &n, const QPoint &_pos)
 	, uID(idCount++)
 	, name(n)
 	, isAlive(true)
-	, imgScaled(scaled(size()*0.75))
+	, imgScaled(scaled(size()*0.66))
 	, activeArea(0)
 	//, groupKey(0)
 {

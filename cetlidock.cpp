@@ -430,20 +430,35 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 	else if (event->button() == Qt::LeftButton) {
 		if (shiftDown && selected) {
 			attachToArea(*selected, true);
-			
 		}
-		else {
-			if (mouseDrag && selected) {
-				selected->pos = mousePos + selected->dragOffset;
+		else if (!KatitoNeni::editEnabled && selected) {
+			SubArea* area = selected->getActiveArea();
+			int bottom = 0;
+			if (area) {
+				selected->setActiveArea(0);
+				SubArea* poolArea1 = areas.area(0);
+				SubArea* poolArea2 = areas.area(1);
+				QSize s1 = poolArea1->getContentsBoud(cetlies);
+				QSize s2 = poolArea2->getContentsBoud(cetlies);
+				QRect r1 = poolArea1->rect();
+				QRect r2 = poolArea2->rect();
+				int bottom = qMax(r1.bottom(), r2.bottom());
 			}
-
+			
+			SubArea* newArea = areas.area(mousePos);
+			if (newArea) {
+				QRect rNew = newArea->rect();
+				rNew.setTop(bottom);
+				newArea->changeRect(rNew);
+			}
+			repaint();
 			if (!hooveredCetlies.empty()) {
 				Cetli* hc = hooveredCetlies.back();
 				if ((hc && selected) && (hc != selected)) {
 					snap(hc, selected);
 					int i = cetlies.indexOf(*hc);
 					cetlies.swapItemsAt(i, cetlies.size() - 1);
-					
+
 					Group g;
 					Group* gp = &g;
 					if (hooveredGroup)
@@ -451,10 +466,35 @@ void CetliDock::mouseReleaseEvent(QMouseEvent * event)
 					gp->addOnce(selected);
 					gp->addOnce(hc);
 					groups.push_back(g);
-					
+
 					selected = hooveredCetlies.back();
 				}
 			}
+			
+		}
+		else {
+			if (mouseDrag && selected) {
+				selected->pos = mousePos + selected->dragOffset;
+			}
+			if (!hooveredCetlies.empty()) {
+				Cetli* hc = hooveredCetlies.back();
+				if ((hc && selected) && (hc != selected)) {
+					snap(hc, selected);
+					int i = cetlies.indexOf(*hc);
+					cetlies.swapItemsAt(i, cetlies.size() - 1);
+
+					Group g;
+					Group* gp = &g;
+					if (hooveredGroup)
+						gp = hooveredGroup;
+					gp->addOnce(selected);
+					gp->addOnce(hc);
+					groups.push_back(g);
+
+					selected = hooveredCetlies.back();
+				}
+			}
+			
 			qDebug() << "==============";
 		}
 		handleDrop();

@@ -11,7 +11,7 @@
 #endif
 
 
-bool KatitoNeni::editEnabled = true;
+bool KatitoNeni::editEnabled = false;
 QSize KatitoNeni::mainSize;
 KatitoNeni* KatitoNeni::instance_ = 0;
 KatitoNeni* KatitoNeni::instance()

@@ -115,7 +115,7 @@ SubArea* SubAreas::adjustX(int oldX, int newX)
 		SubArea* a = areas[i];
 		SubArea* nextArea = i + 1 < areas.size() ? areas[i + 1] : 0;
 		QRect r = a->rect();
-		if (abs(r.left() - oldX) < 5) {
+		if (abs(r.left() - oldX) < 10) {
 			int x = r.left();
 			int y = r.top();
 			int w = r.width();
@@ -160,12 +160,16 @@ void SubAreas::loadAreas(QDataStream& stream)
 {
 	int numAreas;
 	stream >> numAreas;
-	
+	QRect pr;
 	for (int i = 0; i < numAreas; i++) {
 		QRect r;
 		stream >> r;
+		if (pr.top() == r.top()){
+			r.setLeft(pr.right());
+		}
 	
 		areas.push_back(new SubArea(r));
+		pr = r;
 	}
 }
 
@@ -177,10 +181,12 @@ void SubAreas::saveAreas(QDataStream& stream)
 			numAreas++;
 	}
 	stream << numAreas;
+
 	for (SubArea* a : areas) {
 		if (!a->rect().isEmpty()) {
 	
 			stream << a->rect();
+			
 		}
 	}
 }
