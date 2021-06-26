@@ -49,22 +49,28 @@ QSize SubArea::getContentsBoud(QList<Cetli>& cetlies)
 	return s;
 }
 
-void SubArea::rearrangeContent(QList<Cetli>& cetlies)
+void SubArea::rearrangeContent(QList<Cetli>& cetlies, bool byPosition)
 {
 	QRect r;
 	QSize s;
-	QList<Cetli*> tmp;
-	for (Cetli& c : cetlies) {
-		if (c.getActiveArea() == this) {
-			tmp.push_back(&c);
+	if (byPosition) {
+
+	}
+	else {
+		QList<Cetli*> tmp;
+		for (Cetli& c : cetlies) {
+			if (c.getActiveArea() == this) {
+				tmp.push_back(&c);
+			}
+		}
+		reset();
+		for (Cetli* c : tmp) {
+			c->pos = actPos() + areaOffset();
+			allocSize(c->scaledSize());
 		}
 	}
-	reset();
-	for (Cetli* c : tmp) {
-		c->pos = actPos() + areaOffset();
-		allocSize(c->scaledSize());
-	}
 }
+	
 
 void SubArea::changeSize(const QSize& newSize, const QPoint newPos)
 {

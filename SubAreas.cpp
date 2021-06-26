@@ -156,6 +156,38 @@ void SubAreas::rearrangeAreaContents(QList<Cetli>& cetlies)
 	}
 }
 
+void SubAreas::loadAreas(QDataStream& stream)
+{
+	int numAreas;
+	stream >> numAreas;
+	
+	for (int i = 0; i < numAreas; i++) {
+		QRect r;
+		stream >> r;
+	
+		areas.push_back(new SubArea(r));
+	}
+}
+
+void SubAreas::saveAreas(QDataStream& stream)
+{
+	int numAreas = 0;
+	for (SubArea *a : areas) {
+		if (!a->rect().isEmpty())
+			numAreas++;
+	}
+	stream << numAreas;
+	for (SubArea* a : areas) {
+		if (!a->rect().isEmpty()) {
+	
+			stream << a->rect();
+		}
+	}
+}
+
+
+
+
 
 
 
