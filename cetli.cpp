@@ -8,6 +8,7 @@ Cetli::Cetli(const QImage &img,const QString &n, const QPoint &_pos)
 	, name(n)
 	, isAlive(true)
 	, imgScaled(scaled(size()*0.75))
+	, activeArea(0)
 	//, groupKey(0)
 {
 	
@@ -17,13 +18,24 @@ Cetli::Cetli(const QImage &img,const QString &n, const QPoint &_pos)
 
 QRect Cetli::scaledRect()
 {
-	return imgScaled.rect();
+	QRect r(pos.x(), pos.y(), scaledSize().width(), scaledSize().height());
+	return r;// imgScaled.rect();
 
 }
 
 QSize Cetli::scaledSize()
 {
 	return imgScaled.size();
+}
+
+void Cetli::handleDrop()
+{
+	if (activeArea) {
+		QRect areaRect = activeArea->rect();
+		//qDebug() << scaledRect() << activeArea->rect();
+		if (!areaRect.contains(scaledRect()))
+			activeArea = 0;
+	}
 }
 
 void Cetli::scale(float scale)

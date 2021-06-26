@@ -5,7 +5,7 @@
 #include <QImage>
 #include <QString>
 #include <QDebug>
-
+#include "SubArea.h"
 class Cetli : public QImage
 {
 public:
@@ -35,10 +35,24 @@ public:
 		return r;
 	}
 
+	
+
+	SubArea* getActiveArea() {
+		return activeArea;
+	}
+
+	void setActiveArea(SubArea* area) {
+		activeArea = area;
+	}
+
+	void handleDrop();
+
+
 	QImage imgScaled;
 	QRect scaledRect();
 	QSize scaledSize();
 private :
+	SubArea* activeArea;
 	static int idCount;
 };
 

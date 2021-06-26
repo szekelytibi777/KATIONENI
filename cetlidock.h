@@ -49,7 +49,11 @@ public:
 
 	void addToGroup(Cetli* c, Group& g);
 	bool paintEnabled;
-	bool positionsAreLoaded = false;
+	bool positionsAreLoaded = true;
+	void handleDrop();
+	QList<Cetli>& getCetlies() { return cetlies; }
+	void attachToArea(Cetli& cetli, bool rearrangePrevArea = false);
+
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
@@ -82,7 +86,6 @@ private:
     QVector<QListWidgetItem> listItems;
     void fillImage(QImage &img, QRgb color);
     int rand(int min = 0, int max = RAND_MAX);
-	//void walkNeighbours(Cetli* c, QList<Cetli*>& g);
 	void logCetlies();
 	Cetli* cetliOnPosition(const QPoint& pos);
 	QPoint offset;
@@ -110,7 +113,7 @@ private:
 	int rowHeight;
 	void remove(int id);
 
-	void reArrange();
+	void reArrange(SubArea* area = 0);
 	static Cetli nullCetli;
 
 	QPoint actPos;

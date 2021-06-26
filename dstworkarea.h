@@ -11,8 +11,6 @@
 #include <QDragLeaveEvent>
 #include <QMouseEvent>
 #include <QKeyEvent>
-//#include <QMutex>
-//#include <QMutexLocker>
 #include <QMap>
 #include "helper.h"
 

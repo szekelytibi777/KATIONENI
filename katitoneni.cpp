@@ -11,7 +11,7 @@
 #endif
 
 
-bool KatitoNeni::editEnabled = false;
+bool KatitoNeni::editEnabled = true;
 QSize KatitoNeni::mainSize;
 KatitoNeni* KatitoNeni::instance_ = 0;
 KatitoNeni* KatitoNeni::instance()
@@ -243,6 +243,7 @@ void KatitoNeni::onItemDoubleClicked(QListWidgetItem *item)
 {
 	actImagePath = item->data(Qt::UserRole).toString();
 	cetliDock->cetliPath = actImagePath.replace(".jpg", "");
+	cetliDock->paintEnabled = true;
 	loadCetlies();
 	setImage(actImagePath);
 }

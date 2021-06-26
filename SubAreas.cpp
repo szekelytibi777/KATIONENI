@@ -34,6 +34,19 @@ SubArea* SubAreas::area(const QPoint& point)
 	return 0;
 }
 
+SubArea* SubAreas::area(const QRect& rect)
+{
+	int i = 0;
+	for (SubArea* sa : areas) {
+		if (sa->rect().contains(rect)){
+			qDebug() << "========\n" << i << "\n========";
+			return sa;
+		}
+		i++;
+	}
+	return 0;
+}
+
 SubArea* SubAreas::area(const int index)
 {
 	assert(index < areas.size());
@@ -42,25 +55,39 @@ SubArea* SubAreas::area(const int index)
 void SubAreas::createAreas(const QSize& parentArea, bool area0)
 {	
 
-	int w = parentArea.width() / 15;
-	int h = parentArea.height() / 5;
+	int w0 = 400;
+	int w = parentArea.width();
+	int h = parentArea.height();
 	if (area0) {
-		areas.push_back(new SubArea(QRect(0, 0, w, parentArea.height())));
+		areas.push_back(new SubArea(QRect(0, 0, w0, parentArea.height())));
 	}
-	else
+	else {
+		areas.push_back(new SubArea(QRect(0, 0, 0, 0)));
 		w = 0;
-	int stepX = parentArea.width() / 6;
-	int stepY = parentArea.height() / 3;
-	areas.push_back(new SubArea(QRect(0, 0, w, parentArea.height())));
-	for(int i = w;  i < parentArea.width()-w; i+=stepX){
-		areas.push_back(new SubArea(QRect(i, 0, stepX, h)));
 	}
-	//int width = parentArea.width()/2;
-	for (int y = h; y < parentArea.height(); y += stepY) {
-		SubArea *a = new SubArea(QRect(w, y, parentArea.width()-w, stepY));
+
+	int stepX = w / 3;
+	int stepY = h / 3;
+	for (int x = w0; x < w; x += stepX) {
+		areas.push_back(new SubArea(QRect(x, 0, stepX, stepY)));
+	}
+	
+	for (int y = stepY; y < parentArea.height(); y += stepY) {
+		SubArea *a = new SubArea(QRect(w0, y, w, stepY));
 		areas.push_back(a);
 	}
+
+	//qDebug() << areas.size();
 }
+
+void SubAreas::resizeArea(QSize& newSize, int areaIdx)
+{
+	SubArea* a0 = area(areaIdx);
+	if (a0) {
+		a0->changeSize(newSize);
+	}
+}
+
 
 void SubAreas::deleteAreas()
 {
@@ -80,6 +107,40 @@ void SubAreas::paintAreas(QPainter& painter)
 		painter.drawRect(a->rect());
 	}
 }
+
+void SubAreas::adjustX(int oldX, int newX)
+{
+	for (SubArea* a : areas) {
+		QRect r = a->rect();
+		qDebug() << r.left();
+		if (abs(r.left() - oldX) < 5) {
+			int x = r.left();
+			int y = r.top();
+			int w = r.width();
+			int h = r.height();
+			x = newX;
+			w +=  oldX - newX;
+			a->changeRect(QRect(x, y, w, h));
+		}
+	}
+}
+
+void SubAreas::adjustY(int oldY, int newY)
+{
+	for (SubArea* a : areas) {
+		QRect r = a->rect();
+		if (r.top() == oldY) {
+			int x = r.left();
+			int y = r.top();
+			int w = r.width();
+			int h = r.height();
+			y = newY;
+			h += oldY - newY;
+			a->changeRect(QRect(x, y, w, h));
+		}
+	}
+}
+
 
 
 
